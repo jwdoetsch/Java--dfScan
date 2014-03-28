@@ -93,7 +93,7 @@ public class ProgressWindow extends OxideFrame {
 		setBounds(100, 100, 528, 354);
 		centerInViewport();
 		
-		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory();
+		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
 		
 		labelIndexingStatus = oxideComponentFactory.createLabel("Indexing");
 		labelIndexingStatus.setBounds(12, 42, 114, 24);

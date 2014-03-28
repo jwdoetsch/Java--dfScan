@@ -174,7 +174,7 @@ public class ProfileEditorWindow extends OxideFrame {
 		centerInViewport();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory();
+		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
 		
 		panelIndexingOptions = oxideComponentFactory.createTitledPanel("Indexing Options");
 		panelIndexingOptions.setBounds(354, 12, 330, 162);

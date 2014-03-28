@@ -213,7 +213,7 @@ public class ResultsWindow extends OxideFrame {
 		contentPane = this.getContentPane();
 		//super.centerInViewport();
 		
-		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory();
+		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
 		
 		scrollPaneDuplicateFiles = new JScrollPane();
 		scrollPaneDuplicateFiles.setBounds(12, 186, 552, 318);

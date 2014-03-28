@@ -99,31 +99,31 @@ public class MainWindow extends OxideFrame {
 		centerInViewport();
 		//super.centerInViewport();
 		
-		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory();
+		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
 		
-		buttonHome = new OxideMenuButton((String) null);
+		buttonHome = new OxideMenuButton((String) null, getOxideSkin());
 		buttonHome.setText("Home");
 		buttonHome.setBounds(0, 0, 120, 90);
 		getContentPane().add(buttonHome);
 		
-		buttonScan = new OxideMenuButton((String) null);
+		buttonScan = new OxideMenuButton((String) null, getOxideSkin());
 		buttonScan.setText("Scan");
 		buttonScan.setBounds(0, 90, 120, 90);
 		getContentPane().add(buttonScan);
 		
-		buttonHistory = new OxideMenuButton((String) null);
+		buttonHistory = new OxideMenuButton((String) null, getOxideSkin());
 		buttonHistory.setText("History");
 		buttonHistory.setBounds(0, 180, 120, 90);
 		getContentPane().add(buttonHistory);
 		
 		labelMenuBackground = new JLabel("");
 		labelMenuBackground.setOpaque(true);
-		labelMenuBackground.setBackground(getOxideSkin().getOxideShade1());
+		labelMenuBackground.setBackground(getOxideSkin().getShadeColor1());
 		labelMenuBackground.setBounds(0, 0, 120, 450);
 		getContentPane().add(labelMenuBackground);
 		
 		labelMenuSeparator = new JLabel("");
-		labelMenuSeparator.setBackground(OxidePalette.decorationBorderColor);
+		labelMenuSeparator.setBackground(getOxideSkin().getDecorationBorderColor());
 		labelMenuSeparator.setOpaque(true);
 		labelMenuSeparator.setBounds(120, 0, 6, 450);
 		getContentPane().add(labelMenuSeparator);
@@ -167,8 +167,8 @@ public class MainWindow extends OxideFrame {
 		
 		textArea = new JTextArea();
 		textArea.setEditable(false);
-		textArea.setFont(OxidePalette.oxideControlFontFace);
-		textArea.setForeground(OxidePalette.oxideControlFontColor);
+		textArea.setFont(getOxideSkin().getControlFontFace());
+		textArea.setForeground(getOxideSkin().getControlFontColor());
 		scrollPane.setViewportView(textArea);
 		
 		buttonStart = oxideComponentFactory.createButton();

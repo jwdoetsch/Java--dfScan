@@ -73,7 +73,7 @@ public class FilterBuilderWindow extends OxideFrame {
 		setVisible(true);
 		contentPane = this.getContentPane();
 		
-		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory();
+		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
 		
 		comboBoxFilterType = oxideComponentFactory.createComboBox();
 		comboBoxFilterType.setModel(
