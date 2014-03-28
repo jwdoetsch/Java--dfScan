@@ -1,6 +1,7 @@
 package com.doetsch.dfscan.window;
 
 import java.awt.EventQueue;
+import java.awt.Image;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -32,21 +33,28 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.core.Profile;
 import com.doetsch.dfscan.filter.NameContainsFilter;
 import com.doetsch.dfscan.util.ContentIndex;
 import com.doetsch.dfscan.util.HashableFile;
 import com.doetsch.oxide.*;
 
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.ListSelectionModel;
+import javax.swing.JEditorPane;
+
 public class MainWindow extends OxideFrame {
 
-	private OxideMenuButton buttonHome;
+	private OxideMenuButton buttonHelp;
 	private OxideMenuButton buttonScan;
 	private OxideMenuButton buttonHistory;
 	private JLabel labelMenuBackground;
 	private JLabel labelMenuSeparator;
 	private JPanel panelDeck;
-	private JPanel panelHome;
+	private JPanel panelHelp;
 	private JPanel panelScan;
 	private JPanel panelHistory;
 	
@@ -58,8 +66,10 @@ public class MainWindow extends OxideFrame {
 	private JButton buttonStart;
 	private JScrollPane scrollPane;
 	private JTextArea textArea;
-	private JScrollPane scrollPane_1;
-	private JTextPane textPane;
+	private JScrollPane scrollPaneHistory;
+	private JTable tableHistory;
+	private JScrollPane scrollPaneHelp;
+	private JEditorPane editorPaneHelp;
 
 	/**
 	 * Launch the application.
@@ -98,13 +108,15 @@ public class MainWindow extends OxideFrame {
 		setBounds(100, 100, 720, 450);
 		centerInViewport();
 		//super.centerInViewport();
+		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan.png"))).getImage());
 		
 		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
 		
-		buttonHome = new OxideMenuButton((String) null, getOxideSkin());
-		buttonHome.setText("Home");
-		buttonHome.setBounds(0, 0, 120, 90);
-		getContentPane().add(buttonHome);
+		buttonHelp = new OxideMenuButton((String) null, getOxideSkin());
+		buttonHelp.setToolTipText("Opens the dfScan User Guide.");
+		buttonHelp.setText("Help");
+		buttonHelp.setBounds(0, 0, 120, 90);
+		getContentPane().add(buttonHelp);
 		
 		buttonScan = new OxideMenuButton((String) null, getOxideSkin());
 		buttonScan.setText("Scan");
@@ -133,9 +145,23 @@ public class MainWindow extends OxideFrame {
 		getContentPane().add(panelDeck);
 		panelDeck.setLayout(new CardLayout(0, 0));
 		
-		panelHome = new JPanel();
-		panelDeck.add(panelHome, panelID[0]);
-		panelHome.setLayout(null);
+		panelHelp = new JPanel();
+		panelDeck.add(panelHelp, panelID[0]);
+		panelHelp.setLayout(null);
+		
+		scrollPaneHelp = new JScrollPane();
+		scrollPaneHelp.setBounds(12, 12, 570, 426);
+		panelHelp.add(scrollPaneHelp);
+		
+		editorPaneHelp = new JEditorPane();
+		editorPaneHelp.setEditable(false);
+		try {
+			editorPaneHelp.setPage(DFScan.class.getResource("resources/docs/help.html"));
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		scrollPaneHelp.setViewportView(editorPaneHelp);
 		
 		panelScan = new JPanel();
 		panelDeck.add(panelScan, panelID[1]);
@@ -180,12 +206,43 @@ public class MainWindow extends OxideFrame {
 		panelDeck.add(panelHistory, panelID[2]);
 		panelHistory.setLayout(null);
 		
-		scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(36, 150, 420, 198);
-		panelHistory.add(scrollPane_1);
+		scrollPaneHistory = new JScrollPane();
+		scrollPaneHistory.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPaneHistory.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPaneHistory.setBounds(12, 12, 570, 426);
+		panelHistory.add(scrollPaneHistory);
 		
-		textPane = new JTextPane();
-		scrollPane_1.setViewportView(textPane);
+		tableHistory = new JTable();
+		tableHistory.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tableHistory.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		tableHistory.setShowVerticalLines(false);
+		tableHistory.setFillsViewportHeight(true);
+		tableHistory.setModel(new DefaultTableModel(
+			new Object[][] {
+				{"March 28, 2014, 7:37 PM CST", "Found 100 duplicate files (in 35 groups)", "D:\\TV and Movies, D:\\Music, D:\\FlashGet", "March 28, 2014, 7:56 PM CST", "15 minutes, 30 seconds"},
+			},
+			new String[] {
+				"Start Time", "Results", "Target Folders", "Finish Time", "Elapsed Time"
+			}
+		) {
+			boolean[] columnEditables = new boolean[] {
+				false, false, false, false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		});
+		tableHistory.getColumnModel().getColumn(0).setPreferredWidth(179);
+		tableHistory.getColumnModel().getColumn(0).setMinWidth(179);
+		tableHistory.getColumnModel().getColumn(1).setPreferredWidth(228);
+		tableHistory.getColumnModel().getColumn(1).setMinWidth(228);
+		tableHistory.getColumnModel().getColumn(2).setPreferredWidth(93);
+		tableHistory.getColumnModel().getColumn(2).setMinWidth(93);
+		tableHistory.getColumnModel().getColumn(3).setPreferredWidth(168);
+		tableHistory.getColumnModel().getColumn(3).setMinWidth(75);
+		tableHistory.getColumnModel().getColumn(4).setPreferredWidth(107);
+		tableHistory.getColumnModel().getColumn(4).setMinWidth(75);
+		scrollPaneHistory.setViewportView(tableHistory);
 		
 		setMenuButtonColors(0);		
 	}
@@ -202,7 +259,7 @@ public class MainWindow extends OxideFrame {
 			
 		}); 
 
-		buttonHome.setActionListener(new AbstractAction() {
+		buttonHelp.setActionListener(new AbstractAction() {
 
 			@Override
 			public void actionPerformed (ActionEvent arg0) {
@@ -285,19 +342,19 @@ public class MainWindow extends OxideFrame {
 		((CardLayout)panelDeck.getLayout()).show(panelDeck, panelID[selected]);
 		
 		if (selected == 0) {
-			buttonHome.setSelected(true);
+			buttonHelp.setSelected(true);
 			buttonScan.setSelected(false);
 			buttonHistory.setSelected(false);
 			
 		} else if (selected == 1) {
 
-			buttonHome.setSelected(false);
+			buttonHelp.setSelected(false);
 			buttonScan.setSelected(true);
 			buttonHistory.setSelected(false);
 			populateComboBoxProfiles();			
 			
 		} else if (selected == 2) {
-			buttonHome.setSelected(false);
+			buttonHelp.setSelected(false);
 			buttonScan.setSelected(false);
 			buttonHistory.setSelected(true);
 		}
@@ -362,5 +419,4 @@ public class MainWindow extends OxideFrame {
 		ProfileEditorWindow editor = new ProfileEditorWindow(this);
 		
 	}
-	
 }
