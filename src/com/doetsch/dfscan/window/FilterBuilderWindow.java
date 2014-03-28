@@ -21,6 +21,7 @@ import com.doetsch.dfscan.filter.SizeCeilingFilter;
 import com.doetsch.dfscan.filter.SizeFloorFilter;
 import com.doetsch.dfscan.window.*;
 import com.doetsch.oxide.OxideComponentFactory;
+import com.doetsch.oxide.OxideDefaultSkin;
 import com.doetsch.oxide.OxideFrame;
 
 import javax.swing.AbstractAction;
@@ -53,7 +54,7 @@ public class FilterBuilderWindow extends OxideFrame {
 	 * Create the frame.
 	 */
 	public FilterBuilderWindow (OxideFrame parentFrame, DefaultListModel<FilterListEntry> listModel) {
-		super(false);
+		super(false, new OxideDefaultSkin());
 		
 		initComponents();
 		setBehavior();

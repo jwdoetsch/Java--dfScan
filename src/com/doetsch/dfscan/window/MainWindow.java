@@ -86,7 +86,7 @@ public class MainWindow extends OxideFrame {
 	 * Create the frame.
 	 */
 	public MainWindow () {
-		super(true);
+		super(true, new OxideDefaultSkin());
 	
 		initComponents();
 		defineBehavior();
@@ -118,7 +118,7 @@ public class MainWindow extends OxideFrame {
 		
 		labelMenuBackground = new JLabel("");
 		labelMenuBackground.setOpaque(true);
-		labelMenuBackground.setBackground(OxidePalette.oxideShade1);
+		labelMenuBackground.setBackground(getOxideSkin().getOxideShade1());
 		labelMenuBackground.setBounds(0, 0, 120, 450);
 		getContentPane().add(labelMenuBackground);
 		

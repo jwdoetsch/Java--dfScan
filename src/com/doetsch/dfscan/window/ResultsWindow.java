@@ -26,6 +26,7 @@ import com.doetsch.dfscan.core.Report;
 import com.doetsch.dfscan.util.ContentIndex;
 import com.doetsch.dfscan.util.HashableFile;
 import com.doetsch.oxide.OxideComponentFactory;
+import com.doetsch.oxide.OxideDefaultSkin;
 import com.doetsch.oxide.OxideFrame;
 
 import javax.swing.JTextPane;
@@ -194,7 +195,7 @@ public class ResultsWindow extends OxideFrame {
 	 */
 	public ResultsWindow(Report resultsReport) {
 
-		super(false);
+		super(false, new OxideDefaultSkin());
 		
 		this.resultsReport = resultsReport;
 		initComponents();

@@ -29,6 +29,7 @@ import com.doetsch.dfscan.core.DetectionTask;
 import com.doetsch.dfscan.core.Profile;
 import com.doetsch.dfscan.core.Report;
 import com.doetsch.oxide.OxideComponentFactory;
+import com.doetsch.oxide.OxideDefaultSkin;
 import com.doetsch.oxide.OxideFrame;
 
 import javax.swing.JList;
@@ -74,7 +75,7 @@ public class ProgressWindow extends OxideFrame {
 	 * Create the frame.
 	 */
 	public ProgressWindow (Profile detectionProfile) {
-		super(false);
+		super(false, new OxideDefaultSkin());
 		
 		this.detectionProfile = detectionProfile;
 		

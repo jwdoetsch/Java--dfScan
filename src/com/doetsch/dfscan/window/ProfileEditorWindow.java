@@ -47,6 +47,7 @@ import com.doetsch.dfscan.filter.SizeCeilingFilter;
 import com.doetsch.dfscan.filter.SizeFloorFilter;
 import com.doetsch.dfscan.util.FolderChooser;
 import com.doetsch.oxide.OxideComponentFactory;
+import com.doetsch.oxide.OxideDefaultSkin;
 import com.doetsch.oxide.OxideFrame;
 
 import javax.swing.ListSelectionModel;
@@ -127,7 +128,7 @@ public class ProfileEditorWindow extends OxideFrame {
 	 * @wbp.parser.constructor
 	 */
 	public ProfileEditorWindow (OxideFrame parentFrame) {
-		super(false);
+		super(false, new OxideDefaultSkin());
 
 		initComponents();
 		setBehavior();
@@ -137,7 +138,7 @@ public class ProfileEditorWindow extends OxideFrame {
 	}
 	
 	public ProfileEditorWindow (OxideFrame parentFrame, Profile profile) {
-		super (false);
+		super (false, new OxideDefaultSkin());
 		
 		initComponents();
 		setBehavior();
