@@ -7,16 +7,56 @@
 			<span style="font-family:arial,helvetica,sans-serif;">dfScan User Guide</span></h1>
 		<p style="text-align: center;">
 			<span style="font-family:arial,helvetica,sans-serif;">for dfScan version 0.01</span></p>
-		<h2>
-			<span style="font-family:arial,helvetica,sans-serif;">Introduction</span></h2>
+		<hr />
+		<h1>
+			<span style="font-family:arial,helvetica,sans-serif;">Introduction</span></h1>
+		<p>
+			<span style="font-family:arial,helvetica,sans-serif;">dfScan provides a platform which assists in the discovery and handling of duplicate and redundant files on the local host.</span></p>
+		<h1>
+			<span style="font-family:arial,helvetica,sans-serif;">Usage Tutorial</span></h1>
+		<p>
+			<span style="font-family:arial,helvetica,sans-serif;">This tutorial provides an introduction to configuring dfScan&#39;s detection and scanning options, running a scan for duplicate file occurences, reading the results report, and handling duplicate files. The following use case will act as an example to facilitate the introduction.</span></p>
+		<h2 style="margin-left: 40px;">
+			<span style="font-family:arial,helvetica,sans-serif;">Example Use Case</span></h2>
 		<p style="margin-left: 40px;">
-			<span style="font-family:arial,helvetica,sans-serif;">dfScan provides a platform which assists in the discovery and handling of duplicate and redundant files on the local host.</span><span style="font-family:arial,helvetica,sans-serif;"> Features include m</span></p>
-		<h2>
-			<span style="font-family:arial,helvetica,sans-serif;">Usage Tutorial</span></h2>
+			<span style="font-family:arial,helvetica,sans-serif;">A user has a large collection of eBooks on their hard drive in a folder D:/Books. They know that the collection is mostly unorganized and would like to begin organizing it. The user also knows that there are several copies of the eBooks within the collection and would like to find and remove those duplicate copies. The user has chosen dfScan to help them with discovering and handling the duplicate eBooks.</span></p>
+		<h2 style="margin-left: 40px;">
+			<span style="font-family:arial,helvetica,sans-serif;">Configuring dfScan</span></h2>
 		<p style="margin-left: 40px;">
-			<span style="font-family:arial,helvetica,sans-serif;">This tutorial provides an introduction to configuring dfScan&#39;s detection and scanning options, running a scan for duplicate file occurences, reading the results report, and handling duplicate files.</span></p>
-		<h3 style="margin-left: 40px;">
-			<span style="font-family:arial,helvetica,sans-serif;">Configuring dfScan</span></h3>
+			<span style="font-family:arial,helvetica,sans-serif;">It is necessary for the use to specify a configuration (called a <span _fck_bookmark="1" style="display: none;">&nbsp;</span><code>Profile</code><span _fck_bookmark="1" style="display: none;">&nbsp;</span>) that will scan for the duplicate eBooks, or to select an existing configuration. The drop-down selection box in the scan window lists all of the <span _fck_bookmark="1" style="display: none;">&nbsp;</span><code>Profile</code>s <span _fck_bookmark="1" style="display: none;">&nbsp;</span>that have been added and configured since dfScan was first installed. The details of the selected <span _fck_bookmark="1" style="display: none;">&nbsp;</span><code>Profile</code><span _fck_bookmark="1" style="display: none;">&nbsp;</span>&#39;s configuration can be viewed within the text area directly below the drop-down selection box. The selected profile can be edited by selecting a <span _fck_bookmark="1" style="display: none;">&nbsp;</span><code>Profile</code> <span _fck_bookmark="1" style="display: none;">&nbsp;</span>and then clicking the <span _fck_bookmark="1" style="display: none;">&nbsp;</span><code>Edit </code><span _fck_bookmark="1" style="display: none;">&nbsp;</span>button. A new profile can be configured and added to the drop-down selection box by selecting the <span _fck_bookmark="1" style="display: none;">&nbsp;</span><code>Add </code><span _fck_bookmark="1" style="display: none;">&nbsp;</span>button. Once either the<code> <span _fck_bookmark="1" style="display: none;">&nbsp;</span>Edit</code> <span _fck_bookmark="1" style="display: none;">&nbsp;</span>or <code>Add</code> button are selected the <span _fck_bookmark="1" style="display: none;">&nbsp;</span><code>Profile Editor</code> window will appear.</span></p>
+		<h3 style="margin-left: 80px;">
+			<span style="font-family:arial,helvetica,sans-serif;">Using the Profile Editor</span></h3>
+		<p style="margin-left: 80px;">
+			<span style="font-family:arial,helvetica,sans-serif;">There are five components to a <code>Profile </code>configuration: the name and a description of the configuration, the target folders within which to scan,&nbsp; the options by which to scan, and the detection filters that specify the rules that determine what files will be considered scanning candidates. The <code>Profile </code>configuration will be saved in the profiles/ folder within the folder where dfScan is run from.&nbsp; </span></p>
+		<h3 style="margin-left: 120px;">
+			<span style="font-family:arial,helvetica,sans-serif;">Profile Name and Description</span></h3>
+		<p style="margin-left: 120px;">
+			<span style="font-family:arial,helvetica,sans-serif;">The profile name field will determine how the <code>Profile </code>will be identified in the drop-down selection box in the scan window</span>. <span style="font-family:arial,helvetica,sans-serif;">The file name for saving the configuration is derived from the profile name.</span></p>
+		<p style="margin-left: 120px;">
+			<span style="font-family:arial,helvetica,sans-serif;">The description field provides an opportunity to include a simple description of the <code>Profile</code> configuration. The description will be displayed in the profile details area in the scan window. Including a description is optional; it isn&#39;t necessary to populate the description field. </span></p>
+		<h3 style="margin-left: 120px;">
+			<span style="font-family:arial,helvetica,sans-serif;">Target Folders</span></h3>
+		<p style="margin-left: 120px;">
+			<span style="font-family:arial,helvetica,sans-serif;">Adding target folders is quite intuitive. The <code>Add </code>button within the <code>Target Folders</code> pane<span style="font-family:comic sans ms,cursive;"> </span>brings up a folder selection dialog. Once selected, the target folder&#39;s path with appear in the list within <code>Target Folders</code> pane. The <code>Remove </code>button will remove the selected target folder from the list.</span></p>
+		<h3 style="margin-left: 120px;">
+			<span style="font-family:arial,helvetica,sans-serif;">Scanning Options</span></h3>
+		<p style="margin-left: 120px;">
+			<span style="font-family:arial,helvetica,sans-serif;">The <code>Scanning Options</code> pane contains the options that specify how the target folders will be indexed and scanned.</span></p>
+		<p style="margin-left: 120px;">
+			<span style="font-family:arial,helvetica,sans-serif;"><code>Scan inclusively</code> determines whether or not all the files found within the target folders will be considered candidates for scanning and duplicity determination before any filters are applied.</span></p>
+		<p style="margin-left: 120px;">
+			<code>Scan recursively</code> <span style="font-family:arial,helvetica,sans-serif;">determines whether or not to index and scan through any sub-folders found within the target folders.</span></p>
+		<p style="margin-left: 120px;">
+			<code>Scan hidden folders </code><span style="font-family:arial,helvetica,sans-serif;">determines whether or not to index and scan through any target folder or sub-folder that is hidden</span>.</p>
+		<p style="margin-left: 120px;">
+			<span style="font-family:arial,helvetica,sans-serif;"><code>Scan read-only folders</code> determines whether or not to index and scan through any target folder or sub-folder that is read-only</span>.</p>
+		<h3 style="margin-left: 120px;">
+			<span style="font-family:arial,helvetica,sans-serif;">Detection Filters</span></h3>
+		<p style="margin-left: 120px;">
+			<span style="font-family:arial,helvetica,sans-serif;">Detection filters define rules by which to determine whether or not certain files within the target folders will be considered candidates for scanning and duplicate determination. Filters are applied in order, from top to bottom, so the order of filters can produce different results. Selecting the <code>Add </code>button within the <code>Detection Filters</code> pane will display the <code>Build Filter</code> dialog window where a new filter rule can be defined. Selecting the <code>Remove </code>button will remove the selected filter from the filter list. Selecting the <code>Move Up</code> or <code>Move Down</code> button will move the selected filter up or down the filter list.</span></p>
+		<p style="margin-left: 120px;">
+			<span style="font-family:arial,helvetica,sans-serif;">The <code>Build Filter </code>dialog provides options and settings to configure a new filter rule. The drop-down selection box provides six basic rules; a file&#39;s name contains a certain phrase, a file&#39;s path contains a certain phrase, a file&#39;s size is less than or equal to some file size ceiling value, a file&#39;s size is greater than or equal to some file size floor value, a file is hidden, and a file is read-only. The last two options, file is hidden and file is read-only, do not use a qualifying value whereas the hidden/read-only status of the file is determined by the file&#39;s intrinsic attributes. The <code>Qualifying Value</code> is the value by which the basic rule will be applied against. The basic rule and qualifying value are then used to filter the contents of the target folders, determining which files pass the filter. The filter can be applied inclusively or exclusively. Applying the filter inclusively will add any files that pass through the filter to the running index. Applying the filter exclusively will remove any occurrences of any qualifying files from the running index.</span><br />
+			&nbsp;</p>
 		<h3 style="margin-left: 40px;">
 			<span style="font-family:arial,helvetica,sans-serif;">Starting a Scan</span></h3>
 		<h3 style="margin-left: 40px;">

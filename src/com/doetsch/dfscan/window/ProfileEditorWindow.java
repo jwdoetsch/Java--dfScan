@@ -95,7 +95,7 @@ public class ProfileEditorWindow extends OxideFrame {
 
 	
 	
-	private JPanel panelIndexingOptions;
+	private JPanel panelScanningOptions;
 	private JCheckBox checkBoxIndexInclusively;
 	private JCheckBox checkBoxIndexRecursively;
 	private JCheckBox checkBoxIndexHiddenFolders;
@@ -176,30 +176,30 @@ public class ProfileEditorWindow extends OxideFrame {
 		
 		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
 		
-		panelIndexingOptions = oxideComponentFactory.createTitledPanel("Indexing Options");
-		panelIndexingOptions.setBounds(354, 12, 330, 162);
-		getContentPane().add(panelIndexingOptions);
-		panelIndexingOptions.setLayout(null);
+		panelScanningOptions = oxideComponentFactory.createTitledPanel("Scanning Options");
+		panelScanningOptions.setBounds(354, 12, 330, 162);
+		getContentPane().add(panelScanningOptions);
+		panelScanningOptions.setLayout(null);
 		
 		checkBoxIndexInclusively = oxideComponentFactory.createCheckBox();
-		checkBoxIndexInclusively.setText("Index inclusively");
+		checkBoxIndexInclusively.setText("Scan inclusively");
 		checkBoxIndexInclusively.setBounds(6, 40, 312, 18);
-		panelIndexingOptions.add(checkBoxIndexInclusively);
+		panelScanningOptions.add(checkBoxIndexInclusively);
 		
 		checkBoxIndexRecursively = oxideComponentFactory.createCheckBox();
-		checkBoxIndexRecursively.setText("Index recursively");
+		checkBoxIndexRecursively.setText("Scan recursively");
 		checkBoxIndexRecursively.setBounds(6, 66, 312, 18);
-		panelIndexingOptions.add(checkBoxIndexRecursively);
+		panelScanningOptions.add(checkBoxIndexRecursively);
 		
 		checkBoxIndexHiddenFolders = oxideComponentFactory.createCheckBox();
-		checkBoxIndexHiddenFolders.setText("Index hidden folders");
+		checkBoxIndexHiddenFolders.setText("Scan hidden folders");
 		checkBoxIndexHiddenFolders.setBounds(6, 90, 312, 18);
-		panelIndexingOptions.add(checkBoxIndexHiddenFolders);
+		panelScanningOptions.add(checkBoxIndexHiddenFolders);
 		
 		checkBoxIndexReadOnlyFolders = oxideComponentFactory.createCheckBox();
-		checkBoxIndexReadOnlyFolders.setText("Index read-only folders");
+		checkBoxIndexReadOnlyFolders.setText("Scan read-only folders");
 		checkBoxIndexReadOnlyFolders.setBounds(6, 114, 312, 18);
-		panelIndexingOptions.add(checkBoxIndexReadOnlyFolders);
+		panelScanningOptions.add(checkBoxIndexReadOnlyFolders);
 		
 		panelFolders = oxideComponentFactory.createTitledPanel("Target Folders");
 		panelFolders.setBounds(12, 180, 330, 270);
@@ -227,7 +227,7 @@ public class ProfileEditorWindow extends OxideFrame {
 		buttonRemoveFolder.setBounds(168, 24, 150, 24);
 		panelFolders.add(buttonRemoveFolder);
 		
-		panelFilters = oxideComponentFactory.createTitledPanel("Filters");
+		panelFilters = oxideComponentFactory.createTitledPanel("Detection Filters");
 		panelFilters.setBounds(354, 180, 330, 270);
 		getContentPane().add(panelFilters);
 		panelFilters.setLayout(null);
@@ -268,7 +268,7 @@ public class ProfileEditorWindow extends OxideFrame {
 		buttonSave.setBounds(12, 462, 672, 24);
 		getContentPane().add(buttonSave);
 		
-		panelName = oxideComponentFactory.createTitledPanel("Filter Name");
+		panelName = oxideComponentFactory.createTitledPanel("Profile Name");
 		panelName.setBounds(12, 12, 330, 54);
 		getContentPane().add(panelName);
 		
