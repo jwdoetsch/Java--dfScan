@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -18,7 +20,10 @@ import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.ListSelectionModel;
@@ -43,6 +48,14 @@ import java.io.File;
 import javax.swing.JSeparator;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.border.BevelBorder;
+
+import java.awt.FlowLayout;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ResultsWindow extends OxideFrame {
 
@@ -199,11 +212,11 @@ public class ResultsWindow extends OxideFrame {
 	private JButton buttonSelectNone;
 	private JButton buttonHandleSelectedFiles;
 	private JComboBox<String> comboBoxSortBy;
-	private JPanel oxideTitledPanel;
-	private JLabel labelDetailsTop;
-	private JLabel labelDetailsBottom;
-	private JLabel labelDetailsStartTime;
-	private JLabel labelDetailsFinishTime;
+	private JLabel label;
+	private JLabel label_1;
+	private JLabel label_2;
+	private JPanel panel;
+	private JLabel lblStatusBar;
 
 	/**
 	 * Create the frame.
@@ -222,7 +235,8 @@ public class ResultsWindow extends OxideFrame {
 
 	protected void initComponents() {
 		
-		setTitle("Results - " + resultsReport.getStartDate() + " at " + resultsReport.getStartTime());
+		setTitle("Results for scan completed on " + resultsReport.getFinishDate()
+				+ " at " + resultsReport.getFinishTime());
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
 
@@ -234,64 +248,110 @@ public class ResultsWindow extends OxideFrame {
 		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
 		
 		scrollPaneDuplicateFiles = new JScrollPane();
-		scrollPaneDuplicateFiles.setBounds(12, 186, 840, 318);
+		scrollPaneDuplicateFiles.setBounds(12, 126, 840, 354);
 		contentPane.add(scrollPaneDuplicateFiles);
 		
 
 		buttonSelectAll = oxideComponentFactory.createButton();
 		buttonSelectAll.setText("Select All");
-		buttonSelectAll.setBounds(12, 150, 114, 24);
+		buttonSelectAll.setBounds(12, 60, 114, 24);
 		contentPane.add(buttonSelectAll);
 		
 
 		buttonSelectNone = oxideComponentFactory.createButton();
 		buttonSelectNone.setText("Select None");
-		buttonSelectNone.setBounds(138, 150, 132, 24);
+		buttonSelectNone.setBounds(138, 60, 132, 24);
 		contentPane.add(buttonSelectNone);
 		
 		buttonHandleSelectedFiles = oxideComponentFactory.createButton();
 		buttonHandleSelectedFiles.setText("Handle Selected Files");
-		buttonHandleSelectedFiles.setBounds(12, 516, 840, 24);
+		buttonHandleSelectedFiles.setBounds(12, 492, 840, 24);
 		contentPane.add(buttonHandleSelectedFiles);
 		
 
 		comboBoxSortBy = oxideComponentFactory.createComboBox();
 		comboBoxSortBy.setEnabled(false);
 		comboBoxSortBy.setModel(new DefaultComboBoxModel<String>(new String[] {"Sort By...", "Size (Ascending)", "Size (Descending)", "Name (Ascending)", "Name (Descending)"}));
-		comboBoxSortBy.setBounds(282, 150, 570, 24);
+		comboBoxSortBy.setBounds(282, 60, 570, 24);
 		contentPane.add(comboBoxSortBy);
 		
-		oxideTitledPanel = oxideComponentFactory.createTitledPanel("Details");
-		oxideTitledPanel.setBounds(12, 12, 840, 126);
-		getContentPane().add(oxideTitledPanel);
-		oxideTitledPanel.setLayout(null);
+		label = oxideComponentFactory.createLabel("");
+		label.setOpaque(true);
+		label.setBackground(getOxideSkin().getDecorationBorderColor());
+		label.setBounds(0, 42, 864, 6);
+		getContentPane().add(label);
 		
-		labelDetailsTop = oxideComponentFactory.createLabel("");
-		labelDetailsTop.setText("");
-		labelDetailsTop.setBounds(12, 24, 528, 18);
-		oxideTitledPanel.add(labelDetailsTop);
+		label_1 = oxideComponentFactory.createLabel("");
+		label_1.setBounds(12, 12, 846, 18);
+		label_1.setFont(new Font("Arial", Font.PLAIN, 15));
+		getContentPane().add(label_1);
+		label_1.setText("Scan started by " + resultsReport.getUser()
+				+ " on host " + resultsReport.getHost()
+				+ " at " + resultsReport.getStartTime()
+				+ " on " + resultsReport.getStartDate());
 		
-		labelDetailsStartTime = oxideComponentFactory.createLabel("");
-		labelDetailsStartTime.setText("");
-		labelDetailsStartTime.setBounds(12, 48, 528, 18);
-		oxideTitledPanel.add(labelDetailsStartTime);
+		label_2 = oxideComponentFactory.createLabel("");
+		label_2.setBounds(12, 96, 840, 18);
+		label_2.setFont(new Font("Arial", Font.PLAIN, 15));
+		getContentPane().add(label_2);
 		
-		labelDetailsBottom = oxideComponentFactory.createLabel("");
-		labelDetailsBottom.setText("");
-		labelDetailsBottom.setBounds(12, 96, 528, 18);
-		oxideTitledPanel.add(labelDetailsBottom);
+		int fileCount = 0;
+		for (ContentIndex index : resultsReport.getGroups()) {
+			for (HashableFile file : index) {
+				fileCount++;
+			}
+		}
 		
-		labelDetailsFinishTime = oxideComponentFactory.createLabel("");
-		labelDetailsFinishTime.setText("");
-		labelDetailsFinishTime.setBounds(12, 72, 528, 18);
-		oxideTitledPanel.add(labelDetailsFinishTime);
+		label_2.setText("Found " + fileCount + " duplicate files in "
+				+ resultsReport.getGroups().size() + " common groups");
+		
+		panel = new JPanel();
+		panel.setBackground(new Color(216, 216, 216));
+		panel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		panel.setBounds(0, 528, 864, 24);
+		getContentPane().add(panel);
+		panel.setLayout(null);
+		
+		lblStatusBar = oxideComponentFactory.createLabel("");
+		lblStatusBar.setBounds(0, 0, 864, 24);
+		panel.add(lblStatusBar);
 		
 		
 		
 		table = (new GroupTableBuilder(resultsReport.getGroups())).build();
+		table.addMouseListener(new MouseAdapter() {
 
+			public void mousePressed (MouseEvent e) {
+				copyPathToClipboard(e);
+			}
+			
+		});
+		
+		table.setShowVerticalLines(false);
+		table.setRowSelectionAllowed(true);
+		table.setColumnSelectionAllowed(false);
+		
 	}
 
+	private void copyPathToClipboard (MouseEvent e) {
+		
+		String path;
+		Point p = e.getPoint();
+		int row = table.rowAtPoint(p);
+		int col = table.columnAtPoint(p);
+
+		if ((e.getClickCount() == 2)  &&
+				((row > -1) && (col > -1))) {
+
+			path = (String) ((DefaultTableModel)table.getModel()).getValueAt(row, 4);
+		
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			StringSelection clipBoardData = new StringSelection(path);
+			clipboard.setContents(clipBoardData, clipBoardData);
+			lblStatusBar.setText("Copied selected path to clipboard: " + path);		
+		}
+	}
+	
 	private void setBehavior () {
 		// TODO Auto-generated method stub
 	}
@@ -300,25 +360,12 @@ public class ResultsWindow extends OxideFrame {
 		setVisible(true);
 		setResizable(false);
 		
-		labelDetailsTop.setText("Report generated by " + resultsReport.getUser()
-				+ " on " + resultsReport.getHost());
-		
-		
-		labelDetailsStartTime.setText("Started On: " + resultsReport.getStartDate()
-				+ " " + resultsReport.getStartTime());
-				
-		labelDetailsFinishTime.setText("Finished On: " + resultsReport.getFinishDate()
-				+ " " + resultsReport.getFinishTime());
-		
 		int fileCount = 0;
 		for (ContentIndex i : resultsReport.getGroups()) {
 			for (HashableFile f : i) {
 				fileCount++;
 			}
 		}
-		
-		labelDetailsBottom.setText("Found " + resultsReport.getGroups().size()
-				+ " groups of duplicate files containing " + fileCount + " files");
 		
 		
 	}

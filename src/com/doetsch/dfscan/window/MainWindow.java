@@ -2,6 +2,8 @@ package com.doetsch.dfscan.window;
 
 import java.awt.EventQueue;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -12,9 +14,14 @@ import javax.swing.AbstractAction;
 import javax.swing.UIManager;
 import javax.swing.JTextArea;
 
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowStateListener;
@@ -45,6 +52,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.ListSelectionModel;
 import javax.swing.JEditorPane;
+
+import java.awt.Cursor;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.SoftBevelBorder;
 
 public class MainWindow extends OxideFrame {
 
@@ -82,7 +93,7 @@ public class MainWindow extends OxideFrame {
 	}
 	
 	private void initComponents() {
-		setTitle("dfscan v0.01");
+		setTitle("dfScan v0.01");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 720, 450);
 		centerInViewport();
@@ -108,6 +119,7 @@ public class MainWindow extends OxideFrame {
 		getContentPane().add(buttonHistory);
 		
 		labelMenuBackground = new JLabel("");
+		labelMenuBackground.setVisible(false);
 		labelMenuBackground.setOpaque(true);
 		labelMenuBackground.setBackground(getOxideSkin().getShadeColor1());
 		labelMenuBackground.setBounds(0, 0, 120, 450);
@@ -192,36 +204,58 @@ public class MainWindow extends OxideFrame {
 		panelHistory.add(scrollPaneHistory);
 		
 		tableHistory = new JTable();
+		tableHistory.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+		tableHistory.setDoubleBuffered(true);
 		tableHistory.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableHistory.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tableHistory.setShowVerticalLines(false);
 		tableHistory.setFillsViewportHeight(true);
 		tableHistory.setModel(new DefaultTableModel(
-			new Object[][] {
-				{"March 28, 2014, 7:37 PM CST", "Found 100 duplicate files (in 35 groups)", "D:\\TV and Movies, D:\\Music, D:\\FlashGet", "March 28, 2014, 7:56 PM CST", "15 minutes, 30 seconds"},
-			},
+			new Object[][] {},
 			new String[] {
-				"Start Time", "Results", "Target Folders", "Finish Time", "Elapsed Time"
+				"Start Time", "Results", "Finish Time", "Elapsed Time"
 			}
 		) {
 			boolean[] columnEditables = new boolean[] {
-				false, false, false, false, false
+				false, false, false, false
 			};
 			public boolean isCellEditable(int row, int column) {
 				return columnEditables[column];
 			}
 		});
-		tableHistory.getColumnModel().getColumn(0).setPreferredWidth(179);
-		tableHistory.getColumnModel().getColumn(0).setMinWidth(179);
-		tableHistory.getColumnModel().getColumn(1).setPreferredWidth(228);
-		tableHistory.getColumnModel().getColumn(1).setMinWidth(228);
-		tableHistory.getColumnModel().getColumn(2).setPreferredWidth(93);
-		tableHistory.getColumnModel().getColumn(2).setMinWidth(93);
-		tableHistory.getColumnModel().getColumn(3).setPreferredWidth(168);
-		tableHistory.getColumnModel().getColumn(3).setMinWidth(75);
-		tableHistory.getColumnModel().getColumn(4).setPreferredWidth(107);
-		tableHistory.getColumnModel().getColumn(4).setMinWidth(75);
+		tableHistory.getColumnModel().getColumn(0).setPreferredWidth(128);
+		tableHistory.getColumnModel().getColumn(0).setMinWidth(128);
+		tableHistory.getColumnModel().getColumn(1).setPreferredWidth(256);
+		tableHistory.getColumnModel().getColumn(1).setMinWidth(256);
+		tableHistory.getColumnModel().getColumn(2).setPreferredWidth(128);
+		tableHistory.getColumnModel().getColumn(2).setMinWidth(128);
+		tableHistory.getColumnModel().getColumn(3).setPreferredWidth(128);
+		tableHistory.getColumnModel().getColumn(3).setMinWidth(128);
 		scrollPaneHistory.setViewportView(tableHistory);
+		
+//		tableHistory.addMouseListener(new MouseAdapter() {
+//
+//			public void mousePressed (MouseEvent e) {
+//				JTable table = (JTable) e.getSource();
+//				Point p = e.getPoint();
+//				int row = table.rowAtPoint(p);
+//				int col = table.columnAtPoint(p);
+//				if ((row > -1) && (col > -1)) {
+//					if (e.getClickCount() == 2) {
+//						System.out.println((
+//								(DefaultTableModel)table.getModel()).getValueAt(row, 2));
+//						
+//						Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+//						StringSelection path = new StringSelection(
+//								(String) ((DefaultTableModel)table.getModel()).getValueAt(row, 2));
+//						clipboard.setContents(path, path);
+//						
+//					}
+//				}
+//			}
+//			
+//		});
+		
 		
 		setMenuButtonColors(0);		
 	}

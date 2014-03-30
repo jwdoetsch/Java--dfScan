@@ -32,7 +32,6 @@ public class ContentIndex implements Iterable<HashableFile> {
 	}
 
 	private ArrayList<HashableFile> buildIndex (String folderPath) {
-		System.out.println(folderPath);
 		ArrayList<HashableFile> index = new ArrayList<HashableFile>();
 		
 		
