@@ -60,7 +60,7 @@ public class ResultsWindow extends OxideFrame {
 	        super.getTableCellRendererComponent(table,
 	                value, isSelected, hasFocus, row, column);
 	        
-	        if (table.getModel().getValueAt(row, 2) == (Boolean) true) {
+	        if (table.getModel().getValueAt(row, 1) == (Boolean) true) {
 	        
 		        if (table.getModel().getValueAt(row, 0) == (Boolean)true) {
 		            setBackground(new Color(207, 233, 255));
@@ -125,11 +125,11 @@ public class ResultsWindow extends OxideFrame {
 				alternator = !alternator;
 				for (int i = 0; i < index.getSize(); i++) {
 					Object[] rowEntry = {alternator,
-							index.getContents().get(i).length(),
 							index.getContents().get(i).exists(),
 							(i == 0 ? false : true),
 							index.getContents().get(i).getName(),
-							index.getContents().get(i).getPath()};
+							index.getContents().get(i).getPath(),
+							sizeString(index.getContents().get(i).length())};
 					
 					tableModel.addRow(rowEntry);				
 				}
@@ -137,14 +137,24 @@ public class ResultsWindow extends OxideFrame {
 			
 			setColumnProperties(table, 0, false, 0);
 			setColumnProperties(table, 1, false, 0);
-			setColumnProperties(table, 2, false, 0);
-			setColumnProperties(table, 3, false, 24);
-			setColumnProperties(table, 4, true, 350);
-			setColumnProperties(table, 5, true, 650);
+			
+			setColumnProperties(table, 2, false, 24);
+			setColumnProperties(table, 3, true, 350);
+			setColumnProperties(table, 4, true, 650);
+			setColumnProperties(table, 5, false, 100);
 			
 			return table;
 		}
 		
+		private String sizeString (long length) {
+			if (length > 1024)  {
+				return String.valueOf((int) (length / 1024)) + " KB";
+				
+			} else {
+				return length + " B";
+			}
+		}
+
 		private void setColumnProperties (JTable table, int index, boolean isResizable, int width) {
 			TableColumn column = table.getColumnModel().getColumn(index);
 			column.setResizable(isResizable);
@@ -162,13 +172,13 @@ public class ResultsWindow extends OxideFrame {
 	private class GroupTableModel extends DefaultTableModel {
 		
 		Class[] columnTypes = new Class[] {
-				Boolean.class, Long.class, Boolean.class, Boolean.class, String.class, String.class};
-		boolean[] columnEditables = new boolean[] {false, false, false, true, false, false};
+				Boolean.class, Boolean.class, Boolean.class, String.class, String.class, String.class};
+		boolean[] columnEditables = new boolean[] {false, false, true, false, false, false};
 		
 		
 		private GroupTableModel() {
 			super(new Object[][] {},
-				new String[] {"Group Color", "Size", "Exists", "", "File Name", "Path"});
+				new String[] {"Group Color", "Exists", "", "File Name", "Path", "Size"});
 		}
 		
 		public Class getColumnClass(int columnIndex) {
@@ -241,7 +251,7 @@ public class ResultsWindow extends OxideFrame {
 		
 		buttonHandleSelectedFiles = oxideComponentFactory.createButton();
 		buttonHandleSelectedFiles.setText("Handle Selected Files");
-		buttonHandleSelectedFiles.setBounds(12, 516, 552, 24);
+		buttonHandleSelectedFiles.setBounds(12, 516, 840, 24);
 		contentPane.add(buttonHandleSelectedFiles);
 		
 
