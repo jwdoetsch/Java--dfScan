@@ -30,9 +30,9 @@ public class PathContainsFilter extends ContentIndexFilter {
 	
 	@Override
 	public String getDescription () {
-		String description = (super.isInclusive() ? "Inclusive " : "Exclusive ");
-		description += "File Path Contains \"" + super.getQualifierValue().toString()
-				+ "\" Filter";
+		String description = (super.isInclusive() ? "Include" : "Exclude");
+		description += " files with paths containing the phrase \"" + super.getQualifierValue().toString() + "\" ";
+		description += (super.isInclusive() ? "while" : "from") + " scanning";
 		return description;
 	}
 	

@@ -72,27 +72,6 @@ public class MainWindow extends OxideFrame {
 	private JEditorPane editorPaneHelp;
 
 	/**
-	 * Launch the application.
-	 */
-	public static void main (String[] args) {
-		try {
-			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		EventQueue.invokeLater(new Runnable() {
-			public void run () {
-				try {
-					MainWindow frame = new MainWindow();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the frame.
 	 */
 	public MainWindow () {
@@ -108,7 +87,7 @@ public class MainWindow extends OxideFrame {
 		setBounds(100, 100, 720, 450);
 		centerInViewport();
 		//super.centerInViewport();
-		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan.png"))).getImage());
+		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
 		
 		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
 		

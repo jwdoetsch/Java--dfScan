@@ -90,6 +90,8 @@ public class ProgressWindow extends OxideFrame {
 	private void initComponents () {
 		setTitle("Progress");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
+
 		setBounds(100, 100, 528, 354);
 		centerInViewport();
 		

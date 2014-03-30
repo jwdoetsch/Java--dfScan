@@ -27,8 +27,9 @@ public class HiddenFileFilter extends ContentIndexFilter {
 
 	@Override
 	public String getDescription () {
-		String description = (super.isInclusive() ? "Inclusive " : "Exclusive ");
-		description += "Hidden File Filter";
+		String description = (super.isInclusive() ? "Include" : "Exclude");
+		description += " hidden files ";
+		description += (super.isInclusive() ? "while" : "from") + " scanning";
 		return description;
 	}
 	

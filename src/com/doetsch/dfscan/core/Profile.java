@@ -156,27 +156,27 @@ public class Profile {
 		detailedDescription += "\nTarget Folders:\n";
 		
 		for (String targetPath : targets) {
-			detailedDescription += "\t" + targetPath + "\n";
+			detailedDescription += "        " + targetPath + "\n";
 		}
 		
 		detailedDescription += "\nFilters:\n";
 		
 		for (ContentIndexFilter filter : filters) {
-			detailedDescription += "\t" + filter.getDescription() + "\n";
+			detailedDescription += "        " + filter.getDescription() + "\n";
 		}
 		
 		detailedDescription += "\nSettings & Options:\n";
 		
-		detailedDescription += "\t" +
+		detailedDescription += "        " +
 				(settings.getIndexInclusively() ? "Index inclusively" : "Don't index inclusively") + "\n";
 		
-		detailedDescription += "\t" +
+		detailedDescription += "        " +
 				(settings.getIndexRecursively() ? "Index recursively" : "Don't index exclusively") + "\n";
 
-		detailedDescription += "\t" +
+		detailedDescription += "        " +
 				(settings.getIndexHiddenFolders() ? "Index hidden folders" : "Don't index hidden folders") + "\n";
 
-		detailedDescription += "\t" +
+		detailedDescription += "        " +
 				(settings.getIndexReadOnlyFolders() ? "Index read-only folders" : "Don't index read-only folders") + "\n";
 
 		

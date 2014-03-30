@@ -12,6 +12,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextField;
 
+import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.filter.ContentIndexFilter;
 import com.doetsch.dfscan.filter.HiddenFileFilter;
 import com.doetsch.dfscan.filter.NameContainsFilter;
@@ -26,6 +27,7 @@ import com.doetsch.oxide.OxideFrame;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -68,6 +70,8 @@ public class FilterBuilderWindow extends OxideFrame {
 	private void initComponents () {
 		setTitle("Build filter...");
 		setBounds(100, 100, 480, 156);
+		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
+
 		centerInViewport();
 
 		setVisible(true);

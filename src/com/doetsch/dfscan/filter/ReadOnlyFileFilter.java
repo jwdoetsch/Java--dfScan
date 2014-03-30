@@ -27,8 +27,9 @@ public class ReadOnlyFileFilter extends ContentIndexFilter {
 	
 	@Override
 	public String getDescription () {
-		String description = (super.isInclusive() ? "Inclusive " : "Exclusive ");
-		description += "Read Only File Filter";
+		String description = (super.isInclusive() ? "Include" : "Exclude");
+		description += " read-only files ";
+		description += (super.isInclusive() ? "while" : "from") + " scanning";
 		return description;
 	}
 	

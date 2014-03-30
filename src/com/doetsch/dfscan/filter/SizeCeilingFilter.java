@@ -30,9 +30,9 @@ public class SizeCeilingFilter extends ContentIndexFilter {
 	
 	@Override
 	public String getDescription () {
-		String description = (super.isInclusive() ? "Inclusive " : "Exclusive ");
-		description += "File Size Is <=" + ((long) super.getQualifierValue())
-				+ " Filter";
+		String description = (super.isInclusive() ? "Include" : "Exclude");
+		description += " files with sizes less than or equal to " + ((long) super.getQualifierValue()) + " bytes ";
+		description += (super.isInclusive() ? "while" : "from") + " scanning";
 		return description;
 	}
 	

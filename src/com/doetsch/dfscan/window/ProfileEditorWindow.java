@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.EventQueue;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -37,6 +38,7 @@ import java.io.FileNotFoundException;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 
+import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.core.Profile;
 import com.doetsch.dfscan.filter.ContentIndexFilter;
 import com.doetsch.dfscan.filter.HiddenFileFilter;
@@ -169,16 +171,30 @@ public class ProfileEditorWindow extends OxideFrame {
 	
 	private void initComponents() {
 		
+//		setTitle("Results - " + resultsReport.getStartDate() + " at " + resultsReport.getStartTime());
+//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
+//
+//		setBounds(100, 100, 864, 552);
+//		
+//		centerInViewport();
+//		contentPane = this.getContentPane();
+		
 		setTitle("Build Profile...");
-		setBounds(100, 100, 696, 498);
-		centerInViewport();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
+
+		setBounds(100, 100, 696, 498);
+
+		centerInViewport();
+		JPanel contentPane = this.getContentPane();
+		
 		
 		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
 		
 		panelScanningOptions = oxideComponentFactory.createTitledPanel("Scanning Options");
 		panelScanningOptions.setBounds(354, 12, 330, 162);
-		getContentPane().add(panelScanningOptions);
+		contentPane.add(panelScanningOptions);
 		panelScanningOptions.setLayout(null);
 		
 		checkBoxIndexInclusively = oxideComponentFactory.createCheckBox();
@@ -203,7 +219,7 @@ public class ProfileEditorWindow extends OxideFrame {
 		
 		panelFolders = oxideComponentFactory.createTitledPanel("Target Folders");
 		panelFolders.setBounds(12, 180, 330, 270);
-		getContentPane().add(panelFolders);
+		contentPane.add(panelFolders);
 		panelFolders.setLayout(null);
 		
 		scrollPaneFolders = new JScrollPane();
@@ -229,7 +245,7 @@ public class ProfileEditorWindow extends OxideFrame {
 		
 		panelFilters = oxideComponentFactory.createTitledPanel("Detection Filters");
 		panelFilters.setBounds(354, 180, 330, 270);
-		getContentPane().add(panelFilters);
+		contentPane.add(panelFilters);
 		panelFilters.setLayout(null);
 		
 		scrollPaneFilters = new JScrollPane();
@@ -266,11 +282,11 @@ public class ProfileEditorWindow extends OxideFrame {
 		buttonSave = oxideComponentFactory.createButton();
 		buttonSave.setText("Save");
 		buttonSave.setBounds(12, 462, 672, 24);
-		getContentPane().add(buttonSave);
+		contentPane.add(buttonSave);
 		
 		panelName = oxideComponentFactory.createTitledPanel("Profile Name");
 		panelName.setBounds(12, 12, 330, 54);
-		getContentPane().add(panelName);
+		contentPane.add(panelName);
 		
 		textFieldName = oxideComponentFactory.createTextField();
 		textFieldName.setBounds(12, 18, 306, 24);
@@ -278,7 +294,7 @@ public class ProfileEditorWindow extends OxideFrame {
 		
 		panelDescription = oxideComponentFactory.createTitledPanel("Description");
 		panelDescription.setBounds(12, 72, 330, 102);
-		getContentPane().add(panelDescription);
+		contentPane.add(panelDescription);
 		
 		scrollPaneDescription = new JScrollPane();
 		scrollPaneDescription.setBounds(12, 18, 306, 72);
