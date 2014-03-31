@@ -50,6 +50,7 @@ import com.doetsch.dfscan.util.HashableFile;
 import com.doetsch.oxide.*;
 
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.ListSelectionModel;
@@ -214,7 +215,7 @@ public class MainWindow extends OxideFrame {
 		scrollPaneHistory.setBounds(12, 42, 570, 396);
 		panelHistory.add(scrollPaneHistory);
 		
-		tableHistory = new JTable();
+		tableHistory = new JTable() {};
 		tableHistory.setDoubleBuffered(true);
 		tableHistory.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableHistory.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -260,6 +261,11 @@ public class MainWindow extends OxideFrame {
 		
 		reportsHistory = new ArrayList<Report>();
 
+		tableHistory.setColumnModel(new DefaultTableColumnModel() {
+			public void moveColumn (int column, int targetColumn) {
+			}
+		});
+		
 		/*
 		 * Build the table model
 		 */
@@ -277,14 +283,18 @@ public class MainWindow extends OxideFrame {
 		
 		tableHistory.setModel(tableModel);
 		
+
+		
 		/*
 		 * Set column sizes
 		 */
-		int[] columnWidths = {64, 64, 128, 128, 256, 256};
+		//int[] columnWidths = {96, 96, 192, 192, 192, 192};
+		int[][] columnWidths = {{96, 96, 192, 192, 192, 192},
+								{64, 64, 64, 64, 64, 64}};
 		
 		for (int i = 0; i < 6; i++) {
-			tableHistory.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[i]);
-			tableHistory.getColumnModel().getColumn(i).setMinWidth(columnWidths[i]);
+			tableHistory.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[0][i]);
+			tableHistory.getColumnModel().getColumn(i).setMinWidth(columnWidths[1][i]);
 		}
 		
 

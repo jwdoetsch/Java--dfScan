@@ -353,7 +353,35 @@ public class ResultsWindow extends OxideFrame {
 	}
 	
 	private void setBehavior () {
-		// TODO Auto-generated method stub
+
+		buttonSelectAll.addActionListener(new AbstractAction() {
+
+			@Override
+			public void actionPerformed (ActionEvent e) {
+
+				tableSelect(true);
+			}
+			
+		});
+		
+		buttonSelectNone.addActionListener(new AbstractAction() {
+
+			@Override
+			public void actionPerformed (ActionEvent e) {
+
+				tableSelect(false);
+			}
+			
+		});
+	}
+	
+	private void tableSelect (boolean all) {
+		
+		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+		
+		for (int row = 0; row < tableModel.getRowCount(); row++) {
+			tableModel.setValueAt(all, row, 2);
+		}
 	}
 
 	private void setDefaultValues () {
