@@ -2,6 +2,8 @@ package com.doetsch.dfscan.window;
 
 import java.awt.EventQueue;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -12,9 +14,14 @@ import javax.swing.AbstractAction;
 import javax.swing.UIManager;
 import javax.swing.JTextArea;
 
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowStateListener;
@@ -25,6 +32,7 @@ import java.awt.CardLayout;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JScrollPane;
@@ -35,16 +43,23 @@ import org.xml.sax.SAXException;
 
 import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.core.Profile;
+import com.doetsch.dfscan.core.Report;
 import com.doetsch.dfscan.filter.NameContainsFilter;
 import com.doetsch.dfscan.util.ContentIndex;
 import com.doetsch.dfscan.util.HashableFile;
 import com.doetsch.oxide.*;
 
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.ListSelectionModel;
 import javax.swing.JEditorPane;
+
+import java.awt.Cursor;
+
+import javax.swing.border.BevelBorder;
+import javax.swing.border.SoftBevelBorder;
 
 public class MainWindow extends OxideFrame {
 
@@ -57,6 +72,7 @@ public class MainWindow extends OxideFrame {
 	private JPanel panelHelp;
 	private JPanel panelScan;
 	private JPanel panelHistory;
+	private ArrayList<Report> reportsHistory;
 	
 	private final String[] panelID = {"home", "scan", "history"};
 	private JButton buttonEdit;
@@ -70,6 +86,7 @@ public class MainWindow extends OxideFrame {
 	private JTable tableHistory;
 	private JScrollPane scrollPaneHelp;
 	private JEditorPane editorPaneHelp;
+	private JLabel labelReportCount;
 
 	/**
 	 * Create the frame.
@@ -82,7 +99,7 @@ public class MainWindow extends OxideFrame {
 	}
 	
 	private void initComponents() {
-		setTitle("dfscan v0.01");
+		setTitle("dfScan v0.01");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 720, 450);
 		centerInViewport();
@@ -108,6 +125,7 @@ public class MainWindow extends OxideFrame {
 		getContentPane().add(buttonHistory);
 		
 		labelMenuBackground = new JLabel("");
+		labelMenuBackground.setVisible(false);
 		labelMenuBackground.setOpaque(true);
 		labelMenuBackground.setBackground(getOxideSkin().getShadeColor1());
 		labelMenuBackground.setBounds(0, 0, 120, 450);
@@ -170,10 +188,12 @@ public class MainWindow extends OxideFrame {
 		scrollPane.setBounds(12, 30, 546, 312);
 		panelProfileDetails.add(scrollPane);
 		
-		textArea = new JTextArea();
+		//textArea = new JTextArea();
+		textArea = oxideComponentFactory.createTextArea();
 		textArea.setEditable(false);
 		textArea.setFont(getOxideSkin().getControlFontFace());
 		textArea.setForeground(getOxideSkin().getControlFontColor());
+		
 		scrollPane.setViewportView(textArea);
 		
 		buttonStart = oxideComponentFactory.createButton();
@@ -185,47 +205,142 @@ public class MainWindow extends OxideFrame {
 		panelDeck.add(panelHistory, panelID[2]);
 		panelHistory.setLayout(null);
 		
+		labelReportCount = oxideComponentFactory.createLabel("");
+		labelReportCount.setBounds(12, 12, 570, 18);
+		panelHistory.add(labelReportCount);
+		
 		scrollPaneHistory = new JScrollPane();
 		scrollPaneHistory.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPaneHistory.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPaneHistory.setBounds(12, 12, 570, 426);
+		scrollPaneHistory.setBounds(12, 42, 570, 396);
 		panelHistory.add(scrollPaneHistory);
 		
-		tableHistory = new JTable();
+		tableHistory = new JTable() {};
+		tableHistory.setDoubleBuffered(true);
 		tableHistory.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableHistory.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		tableHistory.setShowVerticalLines(false);
 		tableHistory.setFillsViewportHeight(true);
-		tableHistory.setModel(new DefaultTableModel(
-			new Object[][] {
-				{"March 28, 2014, 7:37 PM CST", "Found 100 duplicate files (in 35 groups)", "D:\\TV and Movies, D:\\Music, D:\\FlashGet", "March 28, 2014, 7:56 PM CST", "15 minutes, 30 seconds"},
-			},
-			new String[] {
-				"Start Time", "Results", "Target Folders", "Finish Time", "Elapsed Time"
-			}
-		) {
-			boolean[] columnEditables = new boolean[] {
-				false, false, false, false, false
-			};
-			public boolean isCellEditable(int row, int column) {
-				return columnEditables[column];
-			}
-		});
-		tableHistory.getColumnModel().getColumn(0).setPreferredWidth(179);
-		tableHistory.getColumnModel().getColumn(0).setMinWidth(179);
-		tableHistory.getColumnModel().getColumn(1).setPreferredWidth(228);
-		tableHistory.getColumnModel().getColumn(1).setMinWidth(228);
-		tableHistory.getColumnModel().getColumn(2).setPreferredWidth(93);
-		tableHistory.getColumnModel().getColumn(2).setMinWidth(93);
-		tableHistory.getColumnModel().getColumn(3).setPreferredWidth(168);
-		tableHistory.getColumnModel().getColumn(3).setMinWidth(75);
-		tableHistory.getColumnModel().getColumn(4).setPreferredWidth(107);
-		tableHistory.getColumnModel().getColumn(4).setMinWidth(75);
+		populateHistoryTable();
+		
 		scrollPaneHistory.setViewportView(tableHistory);
+		
+	
+
+		
+		tableHistory.addMouseListener(new MouseAdapter() {
+
+			public void mousePressed (MouseEvent e) {
+				JTable table = (JTable) e.getSource();
+				Point p = e.getPoint();
+				int row = table.rowAtPoint(p);
+				int col = table.columnAtPoint(p);
+				if ((row > -1) && (col > -1)) {
+					if (e.getClickCount() == 2) {
+						
+						new ResultsWindow(reportsHistory.get(row));
+						
+					}
+				}
+			}
+			
+		});
+		
 		
 		setMenuButtonColors(0);		
 	}
 	
+
+	private void populateHistoryTable () {
+		
+		
+		
+		ContentIndex sourceIndex = new ContentIndex("results/");
+		ContentIndex reportIndex = (new NameContainsFilter(".dfscan.report.xml", true)).enforce(sourceIndex);
+		int reportCount = 0;
+		
+		reportsHistory = new ArrayList<Report>();
+
+		tableHistory.setColumnModel(new DefaultTableColumnModel() {
+			public void moveColumn (int column, int targetColumn) {
+			}
+		});
+		
+		/*
+		 * Build the table model
+		 */
+		DefaultTableModel tableModel = new DefaultTableModel( new Object[][] {}, new String[] {
+				"User", " Host", "Started On", "Results", "Finished On", "Elapsed Time"}) {
+			
+			boolean[] columnEditables =
+					new boolean[] {false, false, false, false, false, false};
+			
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		};
+		
+		tableHistory.setModel(tableModel);
+		
+
+		
+		/*
+		 * Set column sizes
+		 */
+		//int[] columnWidths = {96, 96, 192, 192, 192, 192};
+		int[][] columnWidths = {{96, 96, 192, 192, 192, 192},
+								{64, 64, 64, 64, 64, 64}};
+		
+		for (int i = 0; i < 6; i++) {
+			tableHistory.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[0][i]);
+			tableHistory.getColumnModel().getColumn(i).setMinWidth(columnWidths[1][i]);
+		}
+		
+
+	
+
+		/*
+		 * Iterate through the report index. Load the Profile at the current
+		 * file path and add the profile's details to the history table. 
+		 */
+		for (HashableFile file : reportIndex) {
+			
+			if (file.canRead()) {
+				reportsHistory.add(Report.load(file));
+				reportCount++;
+			}
+		}
+		
+		labelReportCount.setText("Found " + reportCount + " reports.");
+		
+		/*
+		 * Populate the table with report data		
+		 */
+		for (Report report : reportsHistory) {
+		
+			int fileCount = 0;
+			
+			for (ContentIndex groupIndex : report.getGroups()) {
+				fileCount += groupIndex.getSize();
+			}
+			
+			String results = "" + fileCount + " files ("
+					+ report.getGroups().size() + " groups)";
+			
+			tableModel.addRow(new Object[] {
+				report.getUser(),
+				report.getHost(),
+				report.getStartDate() + "    " + report.getStartTime(),
+				results,
+				report.getFinishDate() + "    " + report.getFinishTime(),
+				report.getDetectionTime()				
+			});
+
+		}
+				
+	}
+
 	private void defineBehavior () {
 
 		//Stop the application when the main window close button is pressed
@@ -326,7 +441,6 @@ public class MainWindow extends OxideFrame {
 			buttonHistory.setSelected(false);
 			
 		} else if (selected == 1) {
-
 			buttonHelp.setSelected(false);
 			buttonScan.setSelected(true);
 			buttonHistory.setSelected(false);
@@ -336,6 +450,7 @@ public class MainWindow extends OxideFrame {
 			buttonHelp.setSelected(false);
 			buttonScan.setSelected(false);
 			buttonHistory.setSelected(true);
+			populateHistoryTable();
 		}
 	}
 	
