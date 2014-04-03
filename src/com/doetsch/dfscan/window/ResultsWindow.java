@@ -32,6 +32,7 @@ import javax.swing.SwingConstants;
 import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.core.Report;
 import com.doetsch.dfscan.util.ContentIndex;
+import com.doetsch.dfscan.util.FolderChooser;
 import com.doetsch.dfscan.util.HashableFile;
 import com.doetsch.oxide.OxideComponentFactory;
 import com.doetsch.oxide.OxideDefaultSkin;
@@ -44,6 +45,9 @@ import javax.swing.JButton;
 
 import java.awt.Font;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 
 import javax.swing.JSeparator;
 import javax.swing.JComboBox;
@@ -208,14 +212,15 @@ public class ResultsWindow extends OxideFrame {
 	private JTable table;
 	private JScrollPane scrollPaneDuplicateFiles;
 	private Report resultsReport;
-	private JButton buttonHandleSelectedFiles;
+	private JButton buttonMove;
 	private JComboBox<String> comboBoxSortBy;
 	private JLabel label;
 	private JLabel label_1;
 	private JLabel label_2;
 	private JPanel panel;
-	private JLabel lblStatusBar;
+	private JLabel labelStatusBar;
 	private JComboBox comboBoxSelector;
+	private JButton buttonDelete;
 
 	/**
 	 * Create the frame.
@@ -250,10 +255,10 @@ public class ResultsWindow extends OxideFrame {
 		scrollPaneDuplicateFiles.setBounds(12, 126, 840, 354);
 		contentPane.add(scrollPaneDuplicateFiles);
 		
-		buttonHandleSelectedFiles = oxideComponentFactory.createButton();
-		buttonHandleSelectedFiles.setText("Handle Selected Files");
-		buttonHandleSelectedFiles.setBounds(12, 492, 840, 24);
-		contentPane.add(buttonHandleSelectedFiles);
+		buttonMove = oxideComponentFactory.createButton();
+		buttonMove.setText("Move Selected Files...");
+		buttonMove.setBounds(12, 492, 414, 24);
+		contentPane.add(buttonMove);
 		
 
 		comboBoxSortBy = oxideComponentFactory.createComboBox();
@@ -300,17 +305,38 @@ public class ResultsWindow extends OxideFrame {
 		getContentPane().add(panel);
 		panel.setLayout(null);
 		
-		lblStatusBar = oxideComponentFactory.createLabel("");
-		lblStatusBar.setBounds(0, 0, 864, 24);
-		panel.add(lblStatusBar);
+		labelStatusBar = oxideComponentFactory.createLabel("");
+		labelStatusBar.setBounds(0, 0, 864, 24);
+		panel.add(labelStatusBar);
 		
 		comboBoxSelector = oxideComponentFactory.createComboBox();
 		comboBoxSelector.setModel(new DefaultComboBoxModel(new String[] {"Default Selection", "Select All Entries", "Select None"}));
 		comboBoxSelector.setBounds(12, 60, 258, 24);
 		getContentPane().add(comboBoxSelector);
 		
+		buttonDelete = oxideComponentFactory.createButton();
+		buttonDelete.setText("Delete Selected...");
+		buttonDelete.setBounds(438, 492, 414, 24);
+		getContentPane().add(buttonDelete);
 		
 		
+		buildTable();
+//		table = (new GroupTableBuilder(resultsReport.getGroups())).build();
+//		table.addMouseListener(new MouseAdapter() {
+//
+//			public void mousePressed (MouseEvent e) {
+//				copyPathToClipboard(e);
+//			}
+//			
+//		});
+//		
+//		table.setShowVerticalLines(false);
+//		table.setRowSelectionAllowed(true);
+//		table.setColumnSelectionAllowed(false);
+		
+	}
+
+	private void buildTable () {
 		table = (new GroupTableBuilder(resultsReport.getGroups())).build();
 		table.addMouseListener(new MouseAdapter() {
 
@@ -323,9 +349,8 @@ public class ResultsWindow extends OxideFrame {
 		table.setShowVerticalLines(false);
 		table.setRowSelectionAllowed(true);
 		table.setColumnSelectionAllowed(false);
-		
 	}
-
+	
 	private void copyPathToClipboard (MouseEvent e) {
 		
 		String path;
@@ -341,7 +366,7 @@ public class ResultsWindow extends OxideFrame {
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			StringSelection clipBoardData = new StringSelection(path);
 			clipboard.setContents(clipBoardData, clipBoardData);
-			lblStatusBar.setText("Copied selected path to clipboard: " + path);		
+			labelStatusBar.setText("Copied selected path to clipboard: " + path);		
 		}
 	}
 	
@@ -385,9 +410,89 @@ public class ResultsWindow extends OxideFrame {
 			
 		});
 		
+		buttonMove.addActionListener(new AbstractAction() {
+
+			@Override
+			public void actionPerformed (ActionEvent e) {
+
+				File destinationPath = null;
+				ArrayList<File> pathList = getSelectedEntries();
+				FolderChooser folderChooser = new FolderChooser(ResultsWindow.this,
+						new File(System.getProperty("user.home")),
+								"Select destination folder...");
+				
+				if (folderChooser.getFolder()) {
+					destinationPath = folderChooser.getSelectedFile();
+				}
+				
+				if (destinationPath == null) {
+					return;
+				}
+				
+				for (File path : pathList) {
+
+					try {
+						Files.move(FileSystems.getDefault().getPath(path.getPath()),
+								FileSystems.getDefault().getPath(destinationPath.getPath() + "/" + path.getName()));
+						labelStatusBar.setText("Moved " + path.getPath() + ".");
+
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				
+				buildTable();
+				
+			}
+			
+		});
+		
+		buttonDelete.addActionListener(new AbstractAction() {
+
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				File destinationPath = null;
+				ArrayList<File> pathList = getSelectedEntries();
+								
+				for (File path : pathList) {
+					
+					
+					try {
+						Files.deleteIfExists(FileSystems.getDefault().getPath(path.getPath()));
+						labelStatusBar.setText("Deleted " + path.getPath() + ".");
+
+						
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+
+				}
+				
+				buildTable();
+				
+			}
+			
+		});
 		
 	}
 
+	private ArrayList<File> getSelectedEntries () {
+		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+		ArrayList<File> pathList = new ArrayList<File>();
+		
+		for (int row = 0; row < tableModel.getRowCount(); row++) {
+			
+			if (((boolean) tableModel.getValueAt(row, 2)) &&
+				((boolean) tableModel.getValueAt(row, 1))) {
+				
+				pathList.add(new File((String) tableModel.getValueAt(row, 4)));
+			}
+		}
+		
+		return pathList;
+	}
+	
 	private void setDefaultValues () {
 		setVisible(true);
 		setResizable(false);
