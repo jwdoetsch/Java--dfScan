@@ -208,8 +208,6 @@ public class ResultsWindow extends OxideFrame {
 	private JTable table;
 	private JScrollPane scrollPaneDuplicateFiles;
 	private Report resultsReport;
-	private JButton buttonSelectAll;
-	private JButton buttonSelectNone;
 	private JButton buttonHandleSelectedFiles;
 	private JComboBox<String> comboBoxSortBy;
 	private JLabel label;
@@ -217,6 +215,7 @@ public class ResultsWindow extends OxideFrame {
 	private JLabel label_2;
 	private JPanel panel;
 	private JLabel lblStatusBar;
+	private JComboBox comboBoxSelector;
 
 	/**
 	 * Create the frame.
@@ -251,18 +250,6 @@ public class ResultsWindow extends OxideFrame {
 		scrollPaneDuplicateFiles.setBounds(12, 126, 840, 354);
 		contentPane.add(scrollPaneDuplicateFiles);
 		
-
-		buttonSelectAll = oxideComponentFactory.createButton();
-		buttonSelectAll.setText("Select All");
-		buttonSelectAll.setBounds(12, 60, 114, 24);
-		contentPane.add(buttonSelectAll);
-		
-
-		buttonSelectNone = oxideComponentFactory.createButton();
-		buttonSelectNone.setText("Select None");
-		buttonSelectNone.setBounds(138, 60, 132, 24);
-		contentPane.add(buttonSelectNone);
-		
 		buttonHandleSelectedFiles = oxideComponentFactory.createButton();
 		buttonHandleSelectedFiles.setText("Handle Selected Files");
 		buttonHandleSelectedFiles.setBounds(12, 492, 840, 24);
@@ -270,6 +257,7 @@ public class ResultsWindow extends OxideFrame {
 		
 
 		comboBoxSortBy = oxideComponentFactory.createComboBox();
+		comboBoxSortBy.setVisible(false);
 		comboBoxSortBy.setEnabled(false);
 		comboBoxSortBy.setModel(new DefaultComboBoxModel<String>(new String[] {"Sort By...", "Size (Ascending)", "Size (Descending)", "Name (Ascending)", "Name (Descending)"}));
 		comboBoxSortBy.setBounds(282, 60, 570, 24);
@@ -316,6 +304,11 @@ public class ResultsWindow extends OxideFrame {
 		lblStatusBar.setBounds(0, 0, 864, 24);
 		panel.add(lblStatusBar);
 		
+		comboBoxSelector = oxideComponentFactory.createComboBox();
+		comboBoxSelector.setModel(new DefaultComboBoxModel(new String[] {"Default Selection", "Select All Entries", "Select None"}));
+		comboBoxSelector.setBounds(12, 60, 258, 24);
+		getContentPane().add(comboBoxSelector);
+		
 		
 		
 		table = (new GroupTableBuilder(resultsReport.getGroups())).build();
@@ -353,35 +346,46 @@ public class ResultsWindow extends OxideFrame {
 	}
 	
 	private void setBehavior () {
-
-		buttonSelectAll.addActionListener(new AbstractAction() {
+		
+		comboBoxSelector.addActionListener(new AbstractAction() {
 
 			@Override
 			public void actionPerformed (ActionEvent e) {
 
-				tableSelect(true);
+				DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
+				
+				switch (comboBoxSelector.getSelectedIndex()) {
+					case 0:
+						boolean groupID = true;
+						for (int row = 0; row < tableModel.getRowCount(); row++) {
+							if (groupID != (boolean) tableModel.getValueAt(row, 0)) {
+								tableModel.setValueAt(false, row, 2);
+								groupID = !groupID;
+								
+							} else {
+								tableModel.setValueAt(true, row, 2);
+							}
+						}
+						
+						break;
+						
+					case 1:
+						for (int row = 0; row < tableModel.getRowCount(); row++) {
+							tableModel.setValueAt(true, row, 2);
+						}						
+						break;
+						
+					case 2:
+						for (int row = 0; row < tableModel.getRowCount(); row++) {
+							tableModel.setValueAt(false, row, 2);
+						}
+						break;
+				}
 			}
 			
 		});
 		
-		buttonSelectNone.addActionListener(new AbstractAction() {
-
-			@Override
-			public void actionPerformed (ActionEvent e) {
-
-				tableSelect(false);
-			}
-			
-		});
-	}
-	
-	private void tableSelect (boolean all) {
 		
-		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
-		
-		for (int row = 0; row < tableModel.getRowCount(); row++) {
-			tableModel.setValueAt(all, row, 2);
-		}
 	}
 
 	private void setDefaultValues () {
