@@ -393,6 +393,10 @@ public class Report {
 //					+ "_" + report.getTimeStamp() + ".xml";
 			
 			
+			File resultsFolder = new File("results");
+			if (!resultsFolder.exists()) {
+				resultsFolder.mkdir();				
+			}
 			
 			transformer.transform(new DOMSource(document),
 					new StreamResult(new File("results/" + report.getFileName())));

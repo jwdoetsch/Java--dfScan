@@ -462,6 +462,11 @@ public class Profile {
 
 		String fileName = fileNameTransformer(profile.getName());
 		
+		File resultsFolder = new File("profiles");
+		if (!resultsFolder.exists()) {
+			resultsFolder.mkdir();				
+		}
+		
 		transformer.transform(new DOMSource(document),
 				new StreamResult(
 						new File("profiles/" + fileName + ".dfscan.profile.xml")));
