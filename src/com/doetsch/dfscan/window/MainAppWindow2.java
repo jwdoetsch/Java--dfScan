@@ -28,6 +28,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.Component;
+import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -43,8 +44,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import com.doetsch.dfscan.DFScan;
+import com.doetsch.dfscan.core.Profile;
 
 public class MainAppWindow2 extends JFrame {
 
@@ -150,7 +155,7 @@ public class MainAppWindow2 extends JFrame {
 	private JTextPane summaryTextPane;
 	private JTabbedPane profileTabbedPane;
 	private JPanel summaryPanel;
-	private JTabbedPane resultsTabbedPane;
+	private JTabbedPane tabbedPane;
 	private JPanel results1;
 	private JMenu fileMenu;
 	private JPanel foldersPanel;
@@ -285,16 +290,31 @@ public class MainAppWindow2 extends JFrame {
 		splitPane.setLeftComponent(resultsPanel);
 		resultsPanel.setLayout(new BorderLayout(0, 0));
 		
-		resultsTabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		resultsPanel.add(resultsTabbedPane, BorderLayout.CENTER);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		resultsPanel.add(tabbedPane, BorderLayout.CENTER);
 		
 		//results1 = new JPanel();
-		results1 = new TabPanel();
-		results1.setVisible(true);
-		resultsTabbedPane.addTab("Scan in progress...", null, results1, null);
+		results1 = new ReportPanel();
+		//results1.setVisible(true);
+		tabbedPane.addTab("Results for", null, results1, null);
+		tabbedPane.setTabComponentAt(0, new TabLabel(tabbedPane));
 		
-		
-		resultsTabbedPane.setTabComponentAt(0, new TabLabel(resultsTabbedPane));
+		ProgressPanel progress1 = null;
+		try {
+			progress1 = new ProgressPanel(Profile.load("profiles/eBooks.dfscan.profile.xml"), tabbedPane);
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//progress1.setVisible(true);
+		tabbedPane.addTab("Scan in progress...", null, progress1, null);
+		tabbedPane.setTabComponentAt(1, new TabLabel(tabbedPane));
 		
 		profilePanel = new JPanel();
 		splitPane.setRightComponent(profilePanel);

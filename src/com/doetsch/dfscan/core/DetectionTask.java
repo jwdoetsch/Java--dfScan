@@ -45,6 +45,7 @@ import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.filter.ContentIndexFilter;
 import com.doetsch.dfscan.util.ContentIndex;
 import com.doetsch.dfscan.util.HashableFile;
+import com.doetsch.dfscan.window.ProgressPanel;
 import com.doetsch.dfscan.window.ProgressWindow;
 
 /**
@@ -676,7 +677,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	
 	
 	private Profile detectionProfile;
-	private ProgressWindow parentWindow;
+	private ProgressPanel parentWindow;
 	
 	//Result
 	private ContentIndex sourceIndex;
@@ -715,12 +716,12 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	 * 
 	 * @param detectionProfile the Profile defining the targets, settings, and options
 	 * that will guide the detection process
-	 * @param parentWindow the AppWindow UI component that is considered the DetectionTask's
+	 * @param progressPanel the AppWindow UI component that is considered the DetectionTask's
 	 * parent, pop-up windows will be spawned with regard to the parentWindow.
 	 */
-	public DetectionTask (Profile detectionProfile, ProgressWindow parentWindow) {
+	public DetectionTask (Profile detectionProfile, ProgressPanel progressPanel) {
 		this.detectionProfile = detectionProfile;
-		this.parentWindow = parentWindow;
+		this.parentWindow = progressPanel;
 	}
 
 	/**
@@ -862,7 +863,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 
 	protected void process (List<String> entries) {
 		
-		parentWindow.getLabelTimeElapsed().setText("Time Elapsed: "
+		parentWindow.getTimeElapsedLabel().setText("Time Elapsed: "
 				+ (int)((System.currentTimeMillis() - startTime) / 1000) + " seconds");
 		
 		for (String entry : entries) {
@@ -876,22 +877,22 @@ public class DetectionTask extends SwingWorker<Report, String> {
 				return;
 			}
 			
-			parentWindow.getTextAreaLog().append(entry + "\n");
+			parentWindow.getLogTextPane().append(entry + "\n");
 			
 			if (entry == INDEX_BUILDER_STARTED) {
-					parentWindow.getLabelIndexingStatus().setIcon(PROGRESS_ICON);
-					parentWindow.getLabelIndexingStatus().setEnabled(true);
+					parentWindow.getIndexingLabel().setIcon(PROGRESS_ICON);
+					parentWindow.getIndexingLabel().setEnabled(true);
 					
 					
 			} else if (entry == INDEX_BUILDER_FINISHED) {
 					//System.out.println("Indexed " + sourceIndex.getSize() + " files.");
 //					parentWindow.getLabelIndexingResults().setText(
 //							"Indexed " + sourceIndex.getSize() + " files.");
-					parentWindow.getLabelIndexingStatus().setIcon(SUCCESS_ICON); 
+					parentWindow.getIndexingLabel().setIcon(SUCCESS_ICON); 
 					
 			} else if (entry == INDEX_FILTERER_STARTED) {
-					parentWindow.getLabelFilteringStatus().setIcon(PROGRESS_ICON);
-					parentWindow.getLabelFilteringStatus().setEnabled(true);
+					parentWindow.getFilteringLabel().setIcon(PROGRESS_ICON);
+					parentWindow.getFilteringLabel().setEnabled(true);
 					
 			} else if (entry == INDEX_FILTERER_FINISHED) {
 					//System.out.println("Filtered index contains " + filteredIndex.getSize() + " files.");
@@ -901,19 +902,19 @@ public class DetectionTask extends SwingWorker<Report, String> {
 			} else if (entry == INDEX_CULLERBYSIZE_FINISHED) {
 					//System.out.println("Culled (by size) index contains " + culledBySizeIndex.getSize() + " files.");
 					//parentWindow.getLabelFilteringResults().setText(culledBySizeIndex.getSize() + " suspects");
-					parentWindow.getLabelFilteringStatus().setIcon(SUCCESS_ICON);
+					parentWindow.getFilteringLabel().setIcon(SUCCESS_ICON);
 					
 			} else if (entry == INDEX_HASHER_STARTED) {
-					parentWindow.getLabelHashingStatus().setIcon(PROGRESS_ICON);
-					parentWindow.getLabelHashingStatus().setEnabled(true);
+					parentWindow.getHashingLabel().setIcon(PROGRESS_ICON);
+					parentWindow.getHashingLabel().setEnabled(true);
 					
 			} else if (entry == INDEX_HASHER_FINISHED) {
 //					parentWindow.getLabelHashingResults().setText("OK");
-					parentWindow.getLabelHashingStatus().setIcon(SUCCESS_ICON);
+					parentWindow.getHashingLabel().setIcon(SUCCESS_ICON);
 					
 			} else if (entry == INDEX_CULLERBYHASH_STARTED) {
-					parentWindow.getLabelGroupingStatus().setIcon(PROGRESS_ICON);
-					parentWindow.getLabelGroupingStatus().setEnabled(true);
+					parentWindow.getGroupingLabel().setIcon(PROGRESS_ICON);
+					parentWindow.getGroupingLabel().setEnabled(true);
 					
 			} else if (entry == INDEX_CULLERBYHASH_FINISHED) {
 					//publish("Culled (by hash) index contains " + culledByHashIndex.getSize() + " files");
@@ -921,7 +922,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 			} else if (entry == INDEX_GROUP_RESULTS_STARTED) {
 				
 			} else if (entry == INDEX_GROUP_RESULTS_FINISHED) {
-					parentWindow.getLabelGroupingStatus().setIcon(SUCCESS_ICON);
+					parentWindow.getGroupingLabel().setIcon(SUCCESS_ICON);
 //					parentWindow.getLabelGroupingResults().setText(culledByHashIndex.getSize() + " dupes in "
 //					+ indexGroups.size() + " groups");
 			}
