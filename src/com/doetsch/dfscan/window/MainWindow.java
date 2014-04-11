@@ -387,7 +387,7 @@ public class MainWindow extends OxideFrame {
 				
 		
 				if (comboBoxProfile.getSelectedIndex() > -1) {
-					new ProgressWindow(comboBoxProfile.getItemAt(comboBoxProfile.getSelectedIndex()).getProfile());
+					//new ProgressWindow(comboBoxProfile.getItemAt(comboBoxProfile.getSelectedIndex()).getProfile());
 				}
 				
 			}

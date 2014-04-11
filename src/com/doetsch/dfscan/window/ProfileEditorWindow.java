@@ -160,7 +160,10 @@ public class ProfileEditorWindow extends OxideFrame {
 		checkBoxIndexReadOnlyFolders.setSelected(profile.getSettings().getIndexReadOnlyFolders());
 		
 		for (String targetPath : profile.getTargets()) {
-			((DefaultListModel<String>)listFolders.getModel()).addElement(targetPath);
+			DefaultListModel<String> foldersListModel = new DefaultListModel<String>();
+			listFolders.setModel(foldersListModel);
+			//((DefaultListModel<String>)listFolders.getModel()).addElement(targetPath);
+			foldersListModel.addElement(targetPath);
 		}
 		
 		for (ContentIndexFilter filter : profile.getFilters()) {

@@ -46,7 +46,6 @@ import com.doetsch.dfscan.filter.ContentIndexFilter;
 import com.doetsch.dfscan.util.ContentIndex;
 import com.doetsch.dfscan.util.HashableFile;
 import com.doetsch.dfscan.window.ProgressPanel;
-import com.doetsch.dfscan.window.ProgressWindow;
 
 /**
  * DetectionTask is a SwingWorker thread enveloping the detection and
@@ -863,8 +862,9 @@ public class DetectionTask extends SwingWorker<Report, String> {
 
 	protected void process (List<String> entries) {
 		
-		parentWindow.getTimeElapsedLabel().setText("Time Elapsed: "
-				+ (int)((System.currentTimeMillis() - startTime) / 1000) + " seconds");
+		int timeElapsed = (int)((System.currentTimeMillis() - startTime) / 1000);
+		
+		parentWindow.setTabTitle(detectionProfile.getName() + " (" + timeElapsed + " s) ");
 		
 		for (String entry : entries) {
 			

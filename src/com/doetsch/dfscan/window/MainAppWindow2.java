@@ -31,12 +31,13 @@ import java.awt.Component;
 import java.io.IOException;
 
 import javax.swing.AbstractAction;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
@@ -50,100 +51,104 @@ import org.xml.sax.SAXException;
 
 import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.core.Profile;
+import com.doetsch.dfscan.filter.ContentIndexFilter;
+import com.doetsch.dfscan.filter.NameContainsFilter;
+import com.doetsch.dfscan.util.ContentIndex;
+import com.doetsch.dfscan.util.HashableFile;
 
 public class MainAppWindow2 extends JFrame {
 
-	private class TabLabel extends JPanel {
-		
-		private class TabLabelCloseButton extends JLabel {
-			
-			private TabLabelCloseButton () {
-				super();
-				init();
-			}
-			
-			private void init () {
-				this.setPreferredSize(new Dimension(18, 18));
-				this.setIcon(new ImageIcon(DFScan.class.getResource("resources/icons/close_icon.png")));
-				this.setHorizontalAlignment(SwingConstants.CENTER);
-				
-				this.addMouseListener(new MouseAdapter() {
-
-					@Override
-					public void mouseClicked (MouseEvent e) {
-						int i = parentPane.indexOfTabComponent(TabLabel.this);
-						System.out.println(i);
-						if (i > -1) {
-							parentPane.remove(i);
-						}
-					}
-					
-					@Override
-					public void mouseEntered (MouseEvent e) {
-						TabLabelCloseButton.this.setBorder(new LineBorder(new Color(155, 155, 155)));					
-					}
-
-					@Override
-					public void mouseExited (MouseEvent e) {
-						TabLabelCloseButton.this.setBorder(null);
-					}
-
-					@Override
-					public void mousePressed (MouseEvent e) {
-						TabLabelCloseButton.this.setBorder(new LineBorder(new Color(75, 75, 75), 2));					
-					}
-
-					@Override
-					public void mouseReleased (MouseEvent e) {
-						mouseEntered(e);
-					}
-					
-				});
-				
-			}
-			
-		}
-
-		private final JTabbedPane parentPane;
-		
-		private TabLabel (JTabbedPane parentPane) {
-			super(new FlowLayout(FlowLayout.LEFT, 0, 0));
-			this.parentPane = parentPane;
-			init();
-		}
-		
-		private void init() {
-
-			
-			JLabel titleLabel = new JLabel() {
-				@Override
-				public String getText () {
-					int i = parentPane.indexOfTabComponent(TabLabel.this);
-					if (i > -1) {
-						return parentPane.getTitleAt(i);
-					} else {
-						return "";
-					}					
-				}
-			};
-			//titleLabel.setSize(64, 12);
-			titleLabel.setOpaque(true);
-			
-			this.add(titleLabel);
-			this.add(new TabLabelCloseButton());
-			
-		}
-
-	}
+//	private class TabLabel extends JPanel {
+//		
+//		private class TabLabelCloseButton extends JLabel {
+//			
+//			private TabLabelCloseButton () {
+//				super();
+//				init();
+//			}
+//			
+//			private void init () {
+//				this.setPreferredSize(new Dimension(18, 18));
+//				this.setIcon(new ImageIcon(DFScan.class.getResource("resources/icons/close_icon.png")));
+//				this.setHorizontalAlignment(SwingConstants.CENTER);
+//				
+//				this.addMouseListener(new MouseAdapter() {
+//
+//					@Override
+//					public void mouseClicked (MouseEvent e) {
+//						int i = parentPane.indexOfTabComponent(TabLabel.this);
+//						System.out.println(i);
+//						if (i > -1) {
+//							parentPane.remove(i);
+//						}
+//					}
+//					
+//					@Override
+//					public void mouseEntered (MouseEvent e) {
+//						TabLabelCloseButton.this.setBorder(new LineBorder(new Color(155, 155, 155)));					
+//					}
+//
+//					@Override
+//					public void mouseExited (MouseEvent e) {
+//						TabLabelCloseButton.this.setBorder(null);
+//					}
+//
+//					@Override
+//					public void mousePressed (MouseEvent e) {
+//						TabLabelCloseButton.this.setBorder(new LineBorder(new Color(75, 75, 75), 2));					
+//					}
+//
+//					@Override
+//					public void mouseReleased (MouseEvent e) {
+//						mouseEntered(e);
+//					}
+//					
+//				});
+//				
+//			}
+//			
+//		}
+//
+//		private final JTabbedPane parentPane;
+//		
+//		private TabLabel (JTabbedPane parentPane) {
+//			super(new FlowLayout(FlowLayout.LEFT, 0, 0));
+//			this.parentPane = parentPane;
+//			init();
+//		}
+//		
+//		private void init() {
+//
+//			
+//			JLabel titleLabel = new JLabel() {
+//				@Override
+//				public String getText () {
+//					int i = parentPane.indexOfTabComponent(TabLabel.this);
+//					if (i > -1) {
+//						return parentPane.getTitleAt(i);
+//					} else {
+//						return "";
+//					}					
+//				}
+//			};
+//			//titleLabel.setSize(64, 12);
+//			titleLabel.setOpaque(true);
+//			
+//			this.add(titleLabel);
+//			this.add(new TabLabelCloseButton());
+//			
+//		}
+//
+//	}
 	
 	
 	private JPanel contentPane;
 	private JSplitPane splitPane; 
-	private JPanel resultsPanel;
+	private JPanel reportPanel;
 	private JPanel profilePanel;
 	private JMenuBar menuBar;
 	private Box profileSelectionBox;
-	private JComboBox profileComboBox;
+	private JComboBox<ProfileEntry> profileComboBox;
 	private JButton updateButton;
 	private JButton saveAsButton;
 	private JButton importButton;
@@ -152,10 +157,10 @@ public class MainAppWindow2 extends JFrame {
 	private Component startScanRightGlue;
 	private Component startScanLeftGlue;
 	private JScrollPane summaryScrollPane;
-	private JTextPane summaryTextPane;
+	private JTextArea summaryTextArea;
 	private JTabbedPane profileTabbedPane;
 	private JPanel summaryPanel;
-	private JTabbedPane tabbedPane;
+	private JTabbedPane reportTabbedPane;
 	private JPanel results1;
 	private JMenu fileMenu;
 	private JPanel foldersPanel;
@@ -170,7 +175,7 @@ public class MainAppWindow2 extends JFrame {
 	private JButton addFolderButton;
 	private JButton removeFolderButton;
 	private JScrollPane foldersScrollPane;
-	private JList foldersList;
+	private JList<String> foldersList;
 	private JPanel panel;
 	private Box verticalBox;
 	private Box horizontalBox;
@@ -184,10 +189,10 @@ public class MainAppWindow2 extends JFrame {
 	private Box filteringOptionsBox;
 	private Box filtersControlBox;
 	private JScrollPane filtersScrollPane;
-	private JList filtersList;
+	private JList<FilterListEntry> filtersList;
 	private JButton addFilterButton;
 	private JButton removeFilterButton;
-	private JCheckBox chckbxNewCheckBox;
+	private JCheckBox indexInclusivelyCheckBox;
 	private Component filteringOptionsTopGlue;
 	private Component filteringOptionsBottomGlue;
 	private JMenuItem openResultsMenuItem;
@@ -231,7 +236,10 @@ public class MainAppWindow2 extends JFrame {
 	 */
 	public MainAppWindow2 () {
 		initComponents();
+		setBehavior();
+		setDefaultValues();
 	}
+	
 	private void initComponents() {
 		setTitle("dfScan");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -285,36 +293,37 @@ public class MainAppWindow2 extends JFrame {
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		contentPane.add(splitPane, BorderLayout.CENTER);
 		
-		resultsPanel = new JPanel();
-		resultsPanel.setPreferredSize(new Dimension(10, 400));
-		splitPane.setLeftComponent(resultsPanel);
-		resultsPanel.setLayout(new BorderLayout(0, 0));
+		reportPanel = new JPanel();
+		reportPanel.setPreferredSize(new Dimension(10, 400));
+		splitPane.setLeftComponent(reportPanel);
+		reportPanel.setLayout(new BorderLayout(0, 0));
 		
-		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		resultsPanel.add(tabbedPane, BorderLayout.CENTER);
+		reportTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		reportTabbedPane.setPreferredSize(new Dimension(0, 400));
+		reportPanel.add(reportTabbedPane, BorderLayout.CENTER);
 		
-		//results1 = new JPanel();
-		results1 = new ReportPanel();
-		//results1.setVisible(true);
-		tabbedPane.addTab("Results for", null, results1, null);
-		tabbedPane.setTabComponentAt(0, new TabLabel(tabbedPane));
+//		//results1 = new JPanel();
+//		results1 = new ReportPanel();
+//		//results1.setVisible(true);
+//		tabbedPane.addTab("Results for", null, results1, null);
+//		tabbedPane.setTabComponentAt(0, new TabLabel(tabbedPane));
 		
-		ProgressPanel progress1 = null;
-		try {
-			progress1 = new ProgressPanel(Profile.load("profiles/eBooks.dfscan.profile.xml"), tabbedPane);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//progress1.setVisible(true);
-		tabbedPane.addTab("Scan in progress...", null, progress1, null);
-		tabbedPane.setTabComponentAt(1, new TabLabel(tabbedPane));
+//		ProgressPanel progress1 = null;
+//		try {
+//			progress1 = new ProgressPanel(Profile.load("profiles/eBooks.dfscan.profile.xml"), tabbedPane);
+//		} catch (SAXException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (ParserConfigurationException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		//progress1.setVisible(true);
+//		tabbedPane.addTab("Scan in progress...", null, progress1, null);
+//		tabbedPane.setTabComponentAt(1, new TabLabel(tabbedPane));
 		
 		profilePanel = new JPanel();
 		splitPane.setRightComponent(profilePanel);
@@ -324,7 +333,7 @@ public class MainAppWindow2 extends JFrame {
 		profileSelectionBox.setBorder(new EmptyBorder(6, 6, 6, 6));
 		profilePanel.add(profileSelectionBox, BorderLayout.NORTH);
 		
-		profileComboBox = new JComboBox();
+		profileComboBox = new JComboBox<ProfileEntry>();
 		profileSelectionBox.add(profileComboBox);
 		
 		updateButton = new JButton("Update");
@@ -347,9 +356,9 @@ public class MainAppWindow2 extends JFrame {
 		summaryScrollPane = new JScrollPane();
 		summaryPanel.add(summaryScrollPane, BorderLayout.CENTER);
 		
-		summaryTextPane = new JTextPane();
-		summaryTextPane.setEditable(false);
-		summaryScrollPane.setViewportView(summaryTextPane);
+		summaryTextArea = new JTextArea();
+		summaryTextArea.setEditable(false);
+		summaryScrollPane.setViewportView(summaryTextArea);
 		
 		foldersPanel = new JPanel();
 		foldersPanel.setBorder(new EmptyBorder(6, 6, 6, 6));
@@ -371,7 +380,7 @@ public class MainAppWindow2 extends JFrame {
 		foldersScrollPane = new JScrollPane();
 		foldersBox.add(foldersScrollPane);
 		
-		foldersList = new JList();
+		foldersList = new JList<String>();
 		foldersScrollPane.setViewportView(foldersList);
 		
 		indexingOptionsBox = Box.createVerticalBox();
@@ -412,7 +421,7 @@ public class MainAppWindow2 extends JFrame {
 		filtersScrollPane = new JScrollPane();
 		filtersBox.add(filtersScrollPane);
 		
-		filtersList = new JList();
+		filtersList = new JList<FilterListEntry>();
 		filtersScrollPane.setViewportView(filtersList);
 		
 		filteringOptionsBox = Box.createVerticalBox();
@@ -421,8 +430,8 @@ public class MainAppWindow2 extends JFrame {
 		filteringOptionsTopGlue = Box.createVerticalGlue();
 		filteringOptionsBox.add(filteringOptionsTopGlue);
 		
-		chckbxNewCheckBox = new JCheckBox("Index inclusively");
-		filteringOptionsBox.add(chckbxNewCheckBox);
+		indexInclusivelyCheckBox = new JCheckBox("Index inclusively");
+		filteringOptionsBox.add(indexInclusivelyCheckBox);
 		
 		verticalStrut = Box.createVerticalStrut(20);
 		filteringOptionsBox.add(verticalStrut);
@@ -449,5 +458,109 @@ public class MainAppWindow2 extends JFrame {
 		startScanRightGlue = Box.createHorizontalGlue();
 		startScanControlBox.add(startScanRightGlue);
 	}
+	
+	private void setBehavior () {
+		
+		startScanButton.addActionListener(new AbstractAction () {
 
+			@Override
+			public void actionPerformed (ActionEvent arg0) {
+				
+				if (profileComboBox.getSelectedIndex() > -1) {
+					
+					Profile selectedProfile = ((ProfileEntry) profileComboBox.getSelectedItem()).getProfile();
+					final ProgressPanel progressPanel = new ProgressPanel(selectedProfile, reportTabbedPane);
+					
+					reportTabbedPane.addTab(selectedProfile.getName(), null, progressPanel, null);
+					reportTabbedPane.setTabComponentAt(
+							reportTabbedPane.indexOfComponent(progressPanel), progressPanel.getTab());
+				}
+			}
+			
+		});
+		
+		profileComboBox.addActionListener(new AbstractAction () {
+
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				
+				if (e.getActionCommand().equals("comboBoxChanged")) {
+					
+					populateProfileDetails();
+				}
+				
+			}
+			
+		});
+		
+	}
+	
+	private void setDefaultValues () {
+		populateComboBoxProfiles();
+	}
+
+	/*
+	 * Loads the detection scan profiles from the resources/profiles folder
+	 */
+	public void populateComboBoxProfiles () {
+		
+		ContentIndex sourceIndex = new ContentIndex("profiles/");
+		ContentIndex profileIndex = (new NameContainsFilter(".dfscan.profile.xml", true)).enforce(sourceIndex);
+		Profile profile;
+		
+		profileComboBox.setModel(new DefaultComboBoxModel<ProfileEntry>() );
+		
+		for (HashableFile file : profileIndex) {
+
+			try {
+				profile = Profile.load(file.getPath());
+				((DefaultComboBoxModel<ProfileEntry>)profileComboBox.getModel()).addElement(new ProfileEntry(profile));	
+
+			} catch (SAXException e) {
+				e.printStackTrace();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		populateProfileDetails();
+		
+	}
+	
+	private void populateProfileDetails () {
+		
+		if (profileComboBox.getSelectedIndex() > -1) {
+			
+			Profile profile = profileComboBox.getModel().getElementAt(profileComboBox.getSelectedIndex())
+					.getProfile();
+			
+			summaryTextArea.setText("");
+			summaryTextArea.append(profile.getDetailedDescription());
+			
+			scanSubFoldersCheckBox.setSelected(profile.getSettings().getIndexRecursively());
+			scanHiddenFoldersCheckBox.setSelected(profile.getSettings().getIndexHiddenFolders());
+			scanReadOnlyCheckBox.setSelected(profile.getSettings().getIndexReadOnlyFolders());
+			indexInclusivelyCheckBox.setSelected(profile.getSettings().getIndexInclusively());			
+			
+			DefaultListModel<String> foldersListModel = new DefaultListModel<String>();
+			foldersList.setModel(foldersListModel);
+			for (String targetPath : profile.getTargets()) {
+				foldersListModel.addElement(targetPath);
+			}
+			
+			DefaultListModel<FilterListEntry> filtersListModel = new DefaultListModel<FilterListEntry>();
+			filtersList.setModel(filtersListModel);
+			for (ContentIndexFilter filter : profile.getFilters()) {
+				filtersListModel.addElement(new FilterListEntry(filter));
+			}			
+			
+		}
+		
+	}
+	
 }
