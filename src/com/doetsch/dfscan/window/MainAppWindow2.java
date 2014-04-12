@@ -28,6 +28,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.Component;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.AbstractAction;
@@ -44,104 +45,22 @@ import javax.swing.JMenu;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.core.Profile;
+import com.doetsch.dfscan.core.SettingsContainer;
 import com.doetsch.dfscan.filter.ContentIndexFilter;
 import com.doetsch.dfscan.filter.NameContainsFilter;
 import com.doetsch.dfscan.util.ContentIndex;
+import com.doetsch.dfscan.util.FolderChooser;
 import com.doetsch.dfscan.util.HashableFile;
+
+import javax.swing.border.EtchedBorder;
 
 public class MainAppWindow2 extends JFrame {
 
-//	private class TabLabel extends JPanel {
-//		
-//		private class TabLabelCloseButton extends JLabel {
-//			
-//			private TabLabelCloseButton () {
-//				super();
-//				init();
-//			}
-//			
-//			private void init () {
-//				this.setPreferredSize(new Dimension(18, 18));
-//				this.setIcon(new ImageIcon(DFScan.class.getResource("resources/icons/close_icon.png")));
-//				this.setHorizontalAlignment(SwingConstants.CENTER);
-//				
-//				this.addMouseListener(new MouseAdapter() {
-//
-//					@Override
-//					public void mouseClicked (MouseEvent e) {
-//						int i = parentPane.indexOfTabComponent(TabLabel.this);
-//						System.out.println(i);
-//						if (i > -1) {
-//							parentPane.remove(i);
-//						}
-//					}
-//					
-//					@Override
-//					public void mouseEntered (MouseEvent e) {
-//						TabLabelCloseButton.this.setBorder(new LineBorder(new Color(155, 155, 155)));					
-//					}
-//
-//					@Override
-//					public void mouseExited (MouseEvent e) {
-//						TabLabelCloseButton.this.setBorder(null);
-//					}
-//
-//					@Override
-//					public void mousePressed (MouseEvent e) {
-//						TabLabelCloseButton.this.setBorder(new LineBorder(new Color(75, 75, 75), 2));					
-//					}
-//
-//					@Override
-//					public void mouseReleased (MouseEvent e) {
-//						mouseEntered(e);
-//					}
-//					
-//				});
-//				
-//			}
-//			
-//		}
-//
-//		private final JTabbedPane parentPane;
-//		
-//		private TabLabel (JTabbedPane parentPane) {
-//			super(new FlowLayout(FlowLayout.LEFT, 0, 0));
-//			this.parentPane = parentPane;
-//			init();
-//		}
-//		
-//		private void init() {
-//
-//			
-//			JLabel titleLabel = new JLabel() {
-//				@Override
-//				public String getText () {
-//					int i = parentPane.indexOfTabComponent(TabLabel.this);
-//					if (i > -1) {
-//						return parentPane.getTitleAt(i);
-//					} else {
-//						return "";
-//					}					
-//				}
-//			};
-//			//titleLabel.setSize(64, 12);
-//			titleLabel.setOpaque(true);
-//			
-//			this.add(titleLabel);
-//			this.add(new TabLabelCloseButton());
-//			
-//		}
-//
-//	}
-	
-	
 	private JPanel contentPane;
 	private JSplitPane splitPane; 
 	private JPanel reportPanel;
@@ -161,14 +80,13 @@ public class MainAppWindow2 extends JFrame {
 	private JTabbedPane profileTabbedPane;
 	private JPanel summaryPanel;
 	private JTabbedPane reportTabbedPane;
-	private JPanel results1;
 	private JMenu fileMenu;
 	private JPanel foldersPanel;
 	private Box foldersBox;
 	private Box indexingOptionsBox;
 	private JCheckBox scanSubFoldersCheckBox;
 	private JCheckBox scanHiddenFoldersCheckBox;
-	private JCheckBox scanReadOnlyCheckBox;
+	private JCheckBox scanReadOnlyFoldersCheckBox;
 	private Component indexingOptionsTopGlue;
 	private Component indexingOptionsBottonGlue;
 	private Box foldersControlBox;
@@ -176,20 +94,14 @@ public class MainAppWindow2 extends JFrame {
 	private JButton removeFolderButton;
 	private JScrollPane foldersScrollPane;
 	private JList<String> foldersList;
-	private JPanel panel;
-	private Box verticalBox;
-	private Box horizontalBox;
-	private Component horizontalGlue;
-	private JButton button;
-	private JButton button_1;
-	private Component horizontalGlue_1;
-	private JScrollPane scrollPane;
+	private DefaultListModel<String> foldersListModel;
 	private JPanel filtersPanel;
 	private Box filtersBox;
 	private Box filteringOptionsBox;
 	private Box filtersControlBox;
 	private JScrollPane filtersScrollPane;
 	private JList<FilterListEntry> filtersList;
+	private DefaultListModel<FilterListEntry> filtersListModel;
 	private JButton addFilterButton;
 	private JButton removeFilterButton;
 	private JCheckBox indexInclusivelyCheckBox;
@@ -199,15 +111,12 @@ public class MainAppWindow2 extends JFrame {
 	private JMenuItem mntmNewMenuItem;
 	private JSeparator separator;
 	private JMenu helpMenu;
-	private JMenuItem tutorialMenuItem;
 	private JMenuItem aboutMenuItem;
 	private JMenuItem updateMenuItem;
 	private JSeparator helpMenuSeparator;
-	private JMenu viewMenu;
-	private JMenuItem logMenuItem;
 	private JMenuItem guideMenuItem;
-	private JButton btnNewButton;
-	private JButton btnNewButton_1;
+	private JButton moveUpButton;
+	private JButton moveDownButton;
 	private Component verticalStrut;
 
 	/**
@@ -260,20 +169,11 @@ public class MainAppWindow2 extends JFrame {
 		mntmNewMenuItem = new JMenuItem("Exit");
 		fileMenu.add(mntmNewMenuItem);
 		
-		viewMenu = new JMenu("View");
-		menuBar.add(viewMenu);
-		
-		logMenuItem = new JMenuItem("Log");
-		viewMenu.add(logMenuItem);
-		
-		guideMenuItem = new JMenuItem("Usage Guide");
-		viewMenu.add(guideMenuItem);
-		
 		helpMenu = new JMenu("Help");
 		menuBar.add(helpMenu);
 		
-		tutorialMenuItem = new JMenuItem("Usage Guide");
-		helpMenu.add(tutorialMenuItem);
+		guideMenuItem = new JMenuItem("User Guide");
+		helpMenu.add(guideMenuItem);
 		
 		updateMenuItem = new JMenuItem("Check for Updates...");
 		helpMenu.add(updateMenuItem);
@@ -301,30 +201,7 @@ public class MainAppWindow2 extends JFrame {
 		reportTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		reportTabbedPane.setPreferredSize(new Dimension(0, 400));
 		reportPanel.add(reportTabbedPane, BorderLayout.CENTER);
-		
-//		//results1 = new JPanel();
-//		results1 = new ReportPanel();
-//		//results1.setVisible(true);
-//		tabbedPane.addTab("Results for", null, results1, null);
-//		tabbedPane.setTabComponentAt(0, new TabLabel(tabbedPane));
-		
-//		ProgressPanel progress1 = null;
-//		try {
-//			progress1 = new ProgressPanel(Profile.load("profiles/eBooks.dfscan.profile.xml"), tabbedPane);
-//		} catch (SAXException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (ParserConfigurationException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		//progress1.setVisible(true);
-//		tabbedPane.addTab("Scan in progress...", null, progress1, null);
-//		tabbedPane.setTabComponentAt(1, new TabLabel(tabbedPane));
-		
+
 		profilePanel = new JPanel();
 		splitPane.setRightComponent(profilePanel);
 		profilePanel.setLayout(new BorderLayout(0, 0));
@@ -395,8 +272,8 @@ public class MainAppWindow2 extends JFrame {
 		scanHiddenFoldersCheckBox = new JCheckBox("Scan hidden folders");
 		indexingOptionsBox.add(scanHiddenFoldersCheckBox);
 		
-		scanReadOnlyCheckBox = new JCheckBox("Scan read-only folders");
-		indexingOptionsBox.add(scanReadOnlyCheckBox);
+		scanReadOnlyFoldersCheckBox = new JCheckBox("Scan read-only folders");
+		indexingOptionsBox.add(scanReadOnlyFoldersCheckBox);
 		
 		indexingOptionsBottonGlue = Box.createVerticalGlue();
 		indexingOptionsBox.add(indexingOptionsBottonGlue);
@@ -436,11 +313,11 @@ public class MainAppWindow2 extends JFrame {
 		verticalStrut = Box.createVerticalStrut(20);
 		filteringOptionsBox.add(verticalStrut);
 		
-		btnNewButton = new JButton("Move Up");
-		filteringOptionsBox.add(btnNewButton);
+		moveUpButton = new JButton("Move Up");
+		filteringOptionsBox.add(moveUpButton);
 		
-		btnNewButton_1 = new JButton("Move Down");
-		filteringOptionsBox.add(btnNewButton_1);
+		moveDownButton = new JButton("Move Down");
+		filteringOptionsBox.add(moveDownButton);
 		
 		filteringOptionsBottomGlue = Box.createVerticalGlue();
 		filteringOptionsBox.add(filteringOptionsBottomGlue);
@@ -457,24 +334,32 @@ public class MainAppWindow2 extends JFrame {
 		
 		startScanRightGlue = Box.createHorizontalGlue();
 		startScanControlBox.add(startScanRightGlue);
+		splitPane.setDividerLocation(400);
+		
+		showUserGuide();
+//		UserGuidePanel welcomePanel = new UserGuidePanel(reportTabbedPane);
+//		reportTabbedPane.addTab("", null, welcomePanel, "Welcome Page");
+//		reportTabbedPane.setTabComponentAt(
+//				reportTabbedPane.indexOfComponent(welcomePanel), welcomePanel.getTabAsComponent());
 	}
 	
 	private void setBehavior () {
 		
+		/*
+		 * Define the behavior of the UI components within the profile pane
+		 * portion of the split pane.		
+		 */
 		startScanButton.addActionListener(new AbstractAction () {
 
 			@Override
 			public void actionPerformed (ActionEvent arg0) {
 				
-				if (profileComboBox.getSelectedIndex() > -1) {
-					
-					Profile selectedProfile = ((ProfileEntry) profileComboBox.getSelectedItem()).getProfile();
-					final ProgressPanel progressPanel = new ProgressPanel(selectedProfile, reportTabbedPane);
-					
-					reportTabbedPane.addTab(selectedProfile.getName(), null, progressPanel, null);
-					reportTabbedPane.setTabComponentAt(
-							reportTabbedPane.indexOfComponent(progressPanel), progressPanel.getTab());
-				}
+				ProgressPanel progressPanel = new ProgressPanel(buildCurrentDetectionProfile(), reportTabbedPane);
+				reportTabbedPane.addTab("", null, progressPanel, null);
+				reportTabbedPane.setTabComponentAt(
+						reportTabbedPane.indexOfComponent(progressPanel), progressPanel.getTabAsComponent());
+				reportTabbedPane.setSelectedComponent(progressPanel);
+				
 			}
 			
 		});
@@ -493,12 +378,181 @@ public class MainAppWindow2 extends JFrame {
 			
 		});
 		
+		addFilterButton.addActionListener(new AbstractAction () {
+			
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				
+				FilterBuilderWindow filterBuilderWindow =
+						new FilterBuilderWindow(MainAppWindow2.this, filtersListModel);
+				populateProfileSummary();
+			}
+			
+		});
+		
+		removeFilterButton.addActionListener(new AbstractAction () {
+
+			/*
+			 * Removes the filter list element at the selected index, provided
+			 * one is selected and available.
+			 */
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				
+				int index = filtersList.getSelectedIndex();
+				
+				if (index > -1) {
+					filtersListModel.removeElementAt(index);
+				}
+				populateProfileSummary();
+			}
+			
+		});
+		
+		moveUpButton.addActionListener(new AbstractAction () {
+
+			/*
+			 * Move the selected filter entry up the list
+			 */
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				
+				int index = filtersList.getSelectedIndex();
+				
+				if ((index < 0) || (filtersListModel.size() < 2) || (index < 1)) {
+					return;
+				}
+				
+				FilterListEntry entry = filtersListModel.remove(index);
+								
+				filtersListModel.insertElementAt(entry, index - 1);
+				filtersList.setSelectedIndex(index - 1);
+				populateProfileSummary();
+			}
+			
+		});
+		
+		moveDownButton.addActionListener(new AbstractAction () {
+
+			/*
+			 * Move the selected filter entry down the list
+			 */
+			@Override
+			public void actionPerformed (ActionEvent e) {
+			
+				
+				int index = filtersList.getSelectedIndex();
+				
+				if ((index < 0) || (filtersListModel.size() < 2) || (index > (filtersListModel.size() - 2))) {
+					return;
+				}
+				
+				FilterListEntry entry = filtersListModel.remove(index);
+				filtersListModel.insertElementAt(entry, index + 1);
+				filtersList.setSelectedIndex(index + 1);
+				populateProfileSummary();
+			}
+			
+		});
+		
+		addFolderButton.addActionListener(new AbstractAction () {
+			
+			/*
+			 * Displays a folder choosing dialog box and adds the selected folder
+			 * to the target folder list
+			 */
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				
+				FolderChooser folderChooser = new FolderChooser(
+						MainAppWindow2.this, new File(System.getProperty("user.home")), "Select a target folder");
+				
+				if (folderChooser.getFolder() == true) {
+					foldersListModel.addElement(folderChooser.getSelectedFile().getPath());
+				}
+				
+				populateProfileSummary();				
+			}
+			
+		});
+		
+		removeFolderButton.addActionListener(new AbstractAction () {
+
+			@Override
+			public void actionPerformed (ActionEvent e) {
+
+				int index = foldersList.getSelectedIndex();
+				
+				if (index > -1) {
+					foldersListModel.removeElementAt(index);
+				}
+				
+				populateProfileSummary();
+			}
+			
+		});
+		
+		/*
+		 * Defines the behavior of the menu bar items.
+		 */
+		guideMenuItem.addActionListener(new AbstractAction () {
+
+			@Override
+			public void actionPerformed (ActionEvent arg0) {
+				showUserGuide();
+			}
+			
+		});
+		
+		
 	}
 	
 	private void setDefaultValues () {
 		populateComboBoxProfiles();
 	}
+	
+	private Profile buildCurrentDetectionProfile () {
+		Profile selectedProfile;
+		Profile detectionProfile;
+		
+		/*
+		 * While the profile within the profile selector ComboBox could be used,
+		 * the user is able to change the options once the profile is loaded. So the
+		 * current options & settings need to be used.
+		 */
+		if (profileComboBox.getSelectedIndex() > -1) {
+			selectedProfile = ((ProfileEntry) profileComboBox.getSelectedItem()).getProfile();
+			detectionProfile = new Profile(selectedProfile.getName(), selectedProfile.getDescription());					
+		} else {
+			detectionProfile = new Profile("Custom Profile", "Custom Profile Decsription");
+		}
+		
+		//Set the indexing and scanning settings of the detection profile
+		detectionProfile.setSettings(new SettingsContainer(
+				indexInclusivelyCheckBox.isSelected(), scanSubFoldersCheckBox.isSelected(),
+				scanReadOnlyFoldersCheckBox.isSelected(), scanHiddenFoldersCheckBox.isSelected()));
+		
+		//Add the current entries within the filter list to the detection profile
+		for (int i = 0; i < filtersListModel.getSize(); i++) {
+			detectionProfile.getFilters().add(filtersListModel.get(i).getContentIndexFilter());
+		}
+		
+		//Add the current entries within the folder list to the detection profile
+		for (int i = 0; i < foldersListModel.getSize(); i++) {
+			detectionProfile.getTargets().add(foldersListModel.get(i));
+		}
+		
+		return detectionProfile;
+	}
 
+	private void showUserGuide () {
+		UserGuidePanel userGuidePanel = new UserGuidePanel(reportTabbedPane);
+		reportTabbedPane.addTab("", null, userGuidePanel, "Welcome Page");
+		reportTabbedPane.setTabComponentAt(
+				reportTabbedPane.indexOfComponent(userGuidePanel), userGuidePanel.getTabAsComponent());
+		reportTabbedPane.setSelectedComponent(userGuidePanel);
+	}
+	
 	/*
 	 * Loads the detection scan profiles from the resources/profiles folder
 	 */
@@ -532,6 +586,12 @@ public class MainAppWindow2 extends JFrame {
 		
 	}
 	
+	private void populateProfileSummary () {
+		summaryTextArea.setText("");
+		summaryTextArea.append(buildCurrentDetectionProfile().getDetailedDescription());
+		summaryTextArea.setCaretPosition(0);
+	}
+	
 	private void populateProfileDetails () {
 		
 		if (profileComboBox.getSelectedIndex() > -1) {
@@ -539,25 +599,27 @@ public class MainAppWindow2 extends JFrame {
 			Profile profile = profileComboBox.getModel().getElementAt(profileComboBox.getSelectedIndex())
 					.getProfile();
 			
-			summaryTextArea.setText("");
-			summaryTextArea.append(profile.getDetailedDescription());
+//			summaryTextArea.setText("");
+//			summaryTextArea.append(profile.getDetailedDescription());
 			
 			scanSubFoldersCheckBox.setSelected(profile.getSettings().getIndexRecursively());
 			scanHiddenFoldersCheckBox.setSelected(profile.getSettings().getIndexHiddenFolders());
-			scanReadOnlyCheckBox.setSelected(profile.getSettings().getIndexReadOnlyFolders());
+			scanReadOnlyFoldersCheckBox.setSelected(profile.getSettings().getIndexReadOnlyFolders());
 			indexInclusivelyCheckBox.setSelected(profile.getSettings().getIndexInclusively());			
 			
-			DefaultListModel<String> foldersListModel = new DefaultListModel<String>();
+			foldersListModel = new DefaultListModel<String>();
 			foldersList.setModel(foldersListModel);
 			for (String targetPath : profile.getTargets()) {
 				foldersListModel.addElement(targetPath);
 			}
 			
-			DefaultListModel<FilterListEntry> filtersListModel = new DefaultListModel<FilterListEntry>();
+			filtersListModel = new DefaultListModel<FilterListEntry>();
 			filtersList.setModel(filtersListModel);
 			for (ContentIndexFilter filter : profile.getFilters()) {
 				filtersListModel.addElement(new FilterListEntry(filter));
-			}			
+			}
+			
+			populateProfileSummary();
 			
 		}
 		

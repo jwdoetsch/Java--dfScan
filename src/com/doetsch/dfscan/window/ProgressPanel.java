@@ -44,7 +44,6 @@ public class ProgressPanel extends TabbedPanel {
 	private Component indexingStrut;
 	private Component filteringStrut;
 	private Component hashingStrut;
-	private Component leftGlue;
 	private Component rightGlue;
 	private Component groupingStrut;
 	private JButton abortButton;
@@ -54,14 +53,13 @@ public class ProgressPanel extends TabbedPanel {
 	private DetectionTask detectionTask;
 	private Component timeElapsedStrut;
 	private JTabbedPane parentPane;
-	private Component profileNameStrut;
-	private JLabel profileNameLabel;
+	private Component leftGlue;
 
 	/**
 	 * Create the panel.
 	 */
 	public ProgressPanel (Profile detectionProfile, JTabbedPane parentPane) {
-		super("", parentPane);
+		super(detectionProfile.getName());
 		
 		this.detectionProfile = detectionProfile;
 		this.parentPane = parentPane;
@@ -80,13 +78,6 @@ public class ProgressPanel extends TabbedPanel {
 		
 		leftGlue = Box.createHorizontalGlue();
 		statusLabelBox.add(leftGlue);
-		
-		profileNameLabel = new JLabel("Profile: ");
-		statusLabelBox.add(profileNameLabel);
-		
-		profileNameStrut = Box.createHorizontalStrut(20);
-		profileNameStrut.setPreferredSize(new Dimension(36, 0));
-		statusLabelBox.add(profileNameStrut);
 		
 		timeElapsedLabel = new JLabel("Time Elapsed:");
 		statusLabelBox.add(timeElapsedLabel);
@@ -162,8 +153,6 @@ public class ProgressPanel extends TabbedPanel {
 		filteringLabel.setIcon(new ImageIcon(DFScan.class.getResource("resources/icons/yield_icon.png")));
 		hashingLabel.setIcon(new ImageIcon(DFScan.class.getResource("resources/icons/yield_icon.png")));
 		groupingLabel.setIcon(new ImageIcon(DFScan.class.getResource("resources/icons/yield_icon.png")));
-		
-		profileNameLabel.setText("Profile: " + detectionProfile.getName());
 	}
 	
 	private void startDetectionTask () {
@@ -229,7 +218,7 @@ public class ProgressPanel extends TabbedPanel {
 	@Override
 	public void tabButtonAction () {
 		detectionTask.cancel(false);
-		super.closePanel();
+		closePanel();
 	}
 
 	/**
@@ -333,6 +322,15 @@ public class ProgressPanel extends TabbedPanel {
 
 	public void setTabTitle (String title) {
 		super.setTabTitle(title);
+	}
+
+	@Override
+	public void closePanel () {
+		int tabIndex = parentPane.indexOfComponent(this);
+		
+		if (tabIndex > -1) {
+			parentPane.remove(tabIndex);
+		}
 	}
 	
 }

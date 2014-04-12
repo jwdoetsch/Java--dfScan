@@ -1,6 +1,7 @@
 package com.doetsch.dfscan.window;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 
@@ -50,21 +51,21 @@ public class FilterBuilderWindow extends OxideFrame {
 	private ContentIndexFilter newFilter;
 	private JButton buttonClose;
 	private DefaultListModel<FilterListEntry> listModelFilters;
-	private OxideFrame parentFrame;
+	private Component parentFrame;
 	
 	/**
 	 * Create the frame.
 	 */
-	public FilterBuilderWindow (OxideFrame parentFrame, DefaultListModel<FilterListEntry> listModel) {
+	public FilterBuilderWindow (Component mainAppWindow2, DefaultListModel<FilterListEntry> listModel) {
 		super(false, new OxideDefaultSkin());
 		
 		initComponents();
 		setBehavior();
 		
-		this.parentFrame = parentFrame;
+		this.parentFrame = mainAppWindow2;
 		this.listModelFilters = listModel;
 		newFilter = null;
-		parentFrame.setEnabled(false);
+		mainAppWindow2.setEnabled(false);
 	}
 
 	private void initComponents () {

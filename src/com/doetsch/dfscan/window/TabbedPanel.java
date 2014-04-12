@@ -67,50 +67,56 @@ public abstract class TabbedPanel extends JPanel {
 			
 		}
 		
-		public TabLabel () {
+		String title;
+		JLabel tabTitleLabel;
+		TabLabelCloseButton closeButton;
+		
+		
+		
+		public TabLabel (String title) {
 			super(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
+			this.title = title;
 			init();
 		}
 		
 		private void init() {
-
 			
-			JLabel titleLabel = new JLabel() {
-				@Override
-				public String getText () {
-					int i = parentPane.indexOfComponent(TabbedPanel.this);
-					if (i > -1) {
-						return parentPane.getTitleAt(i);
-					} else {
-						return "";
-					}					
-				}
-			};
-
-			titleLabel.setOpaque(true);
-			this.add(titleLabel);
+			tabTitleLabel = new JLabel();
+			setTabTitle(title);
+			tabTitleLabel.setOpaque(true);
+			this.add(tabTitleLabel);
 			this.add(new TabLabelCloseButton());
+			this.repaint();
 		}
 		
-		public void setTitle (String title) {
-			int i = parentPane.indexOfTabComponent(this);
-			
-			if (i > -1) {
-				parentPane.setTitleAt(i, title);
-			}
+		private String getTabTitle () {
+			return title;
 		}
-
+		
+		private void setTabTitle (String title) {
+			this.title = title;
+			tabTitleLabel.setText(title + " ");
+			tabTitleLabel.repaint();
+		}
 	}
 
 	
 	private TabLabel tab;
-	private JTabbedPane parentPane;
 	private AbstractAction buttonAction;
+//	private String title;
+//	private JLabel titleLabel;
 	
-	public TabbedPanel (String title, JTabbedPane parentPane) {
-		this.parentPane = parentPane;
-		this.tab = new TabLabel();
+	public TabbedPanel (String title) {
+		this.tab = new TabLabel(title);
+//		this.title = title;
+
+		
+		init();
+	}
+	
+	private void init () {
+		
 		this.buttonAction = new AbstractAction () {
 
 			@Override
@@ -124,34 +130,17 @@ public abstract class TabbedPanel extends JPanel {
 	public abstract void tabButtonAction ();
 	
 	public void setTabTitle (String title) {
-		int tabIndex = parentPane.indexOfComponent(this);
-		
-		if (tabIndex > -1) {
-			parentPane.setTitleAt(tabIndex, title);
-		}
+		this.tab.setTabTitle(title);
 	}
 	
 	public String getTabTitle () {
-		int tabIndex = parentPane.indexOfComponent(this);
-		
-		if (tabIndex > -1) {
-			return parentPane.getTitleAt(tabIndex);
-		}
-		
-		return "";
+		return this.tab.getTabTitle();
 	}
-
 	
-	public Component getTab () {
+	public Component getTabAsComponent () {
 		return tab;
 	}
 	
-	public void closePanel () {
-		int tabIndex = parentPane.indexOfComponent(this);
-		
-		if (tabIndex > -1) {
-			//return parentPane.getTitleAt(tabIndex);
-			parentPane.remove(tabIndex);
-		}
-	}
+	public abstract void closePanel ();
+
 }
