@@ -35,6 +35,7 @@ public class ReportPanel extends JPanel {
 	private JComboBox comboBox_4;
 	private Component horizontalGlue_4;
 	private JButton btnNewButton;
+	private JButton saveReportButton;
 
 	/**
 	 * Create the panel.
@@ -62,6 +63,10 @@ public class ReportPanel extends JPanel {
 		comboBox_3.setModel(new DefaultComboBoxModel(new String[] {"Select Defaults", "Select All", "Select None"}));
 		horizontalBox_5.add(comboBox_3);
 		
+		comboBox_4 = new JComboBox();
+		comboBox_4.setModel(new DefaultComboBoxModel(new String[] {"Sort By..."}));
+		horizontalBox_5.add(comboBox_4);
+		
 		btnNewButton_4 = new JButton("Delete Selected");
 		horizontalBox_5.add(btnNewButton_4);
 		
@@ -74,9 +79,8 @@ public class ReportPanel extends JPanel {
 		btnNewButton = new JButton("Refresh Report");
 		horizontalBox_5.add(btnNewButton);
 		
-		comboBox_4 = new JComboBox();
-		comboBox_4.setModel(new DefaultComboBoxModel(new String[] {"Sort By..."}));
-		horizontalBox_5.add(comboBox_4);
+		saveReportButton = new JButton("Save Report");
+		horizontalBox_5.add(saveReportButton);
 		
 		scrollPane_2 = new JScrollPane();
 		add(scrollPane_2, BorderLayout.CENTER);

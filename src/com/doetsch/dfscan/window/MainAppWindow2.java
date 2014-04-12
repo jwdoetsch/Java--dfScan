@@ -58,6 +58,9 @@ import com.doetsch.dfscan.util.FolderChooser;
 import com.doetsch.dfscan.util.HashableFile;
 
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.border.TitledBorder;
 
 public class MainAppWindow2 extends JFrame {
 
@@ -70,7 +73,7 @@ public class MainAppWindow2 extends JFrame {
 	private JComboBox<ProfileEntry> profileComboBox;
 	private JButton updateButton;
 	private JButton saveAsButton;
-	private JButton importButton;
+	private JButton renameButton;
 	private Box startScanControlBox;
 	private JButton startScanButton;
 	private Component startScanRightGlue;
@@ -118,6 +121,11 @@ public class MainAppWindow2 extends JFrame {
 	private JButton moveUpButton;
 	private JButton moveDownButton;
 	private Component verticalStrut;
+	private JButton refreshButton;
+	private Component saveStrut;
+	private JPanel headerPanel;
+	private JTextField nameTextField;
+	private JTextArea descriptionTextArea;
 
 	/**
 	 * Launch the application.
@@ -213,14 +221,11 @@ public class MainAppWindow2 extends JFrame {
 		profileComboBox = new JComboBox<ProfileEntry>();
 		profileSelectionBox.add(profileComboBox);
 		
-		updateButton = new JButton("Update");
-		profileSelectionBox.add(updateButton);
+		refreshButton = new JButton("Refresh");
+		profileSelectionBox.add(refreshButton);
 		
-		saveAsButton = new JButton("Save As...");
-		profileSelectionBox.add(saveAsButton);
-		
-		importButton = new JButton("Import");
-		profileSelectionBox.add(importButton);
+		renameButton = new JButton("Rename");
+		profileSelectionBox.add(renameButton);
 		
 		profileTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		profilePanel.add(profileTabbedPane, BorderLayout.CENTER);
@@ -236,6 +241,18 @@ public class MainAppWindow2 extends JFrame {
 		summaryTextArea = new JTextArea();
 		summaryTextArea.setEditable(false);
 		summaryScrollPane.setViewportView(summaryTextArea);
+		
+		headerPanel = new JPanel();
+		headerPanel.setBorder(new EmptyBorder(6, 6, 6, 6));
+		profileTabbedPane.addTab("Header", null, headerPanel, null);
+		headerPanel.setLayout(new BorderLayout(0, 0));
+		
+		nameTextField = new JTextField();
+		headerPanel.add(nameTextField, BorderLayout.NORTH);
+		nameTextField.setColumns(10);
+		
+		descriptionTextArea = new JTextArea();
+		headerPanel.add(descriptionTextArea, BorderLayout.CENTER);
 		
 		foldersPanel = new JPanel();
 		foldersPanel.setBorder(new EmptyBorder(6, 6, 6, 6));
@@ -260,6 +277,9 @@ public class MainAppWindow2 extends JFrame {
 		foldersList = new JList<String>();
 		foldersScrollPane.setViewportView(foldersList);
 		
+		foldersListModel = new DefaultListModel<String>();
+		foldersList.setModel(foldersListModel);
+		
 		indexingOptionsBox = Box.createVerticalBox();
 		foldersPanel.add(indexingOptionsBox, BorderLayout.EAST);
 		
@@ -274,7 +294,7 @@ public class MainAppWindow2 extends JFrame {
 		
 		scanReadOnlyFoldersCheckBox = new JCheckBox("Scan read-only folders");
 		indexingOptionsBox.add(scanReadOnlyFoldersCheckBox);
-		
+
 		indexingOptionsBottonGlue = Box.createVerticalGlue();
 		indexingOptionsBox.add(indexingOptionsBottonGlue);
 		
@@ -300,6 +320,9 @@ public class MainAppWindow2 extends JFrame {
 		
 		filtersList = new JList<FilterListEntry>();
 		filtersScrollPane.setViewportView(filtersList);
+		
+		filtersListModel = new DefaultListModel<FilterListEntry>();
+		filtersList.setModel(filtersListModel);
 		
 		filteringOptionsBox = Box.createVerticalBox();
 		filtersPanel.add(filteringOptionsBox, BorderLayout.EAST);
@@ -329,6 +352,15 @@ public class MainAppWindow2 extends JFrame {
 		startScanLeftGlue = Box.createHorizontalGlue();
 		startScanControlBox.add(startScanLeftGlue);
 		
+		updateButton = new JButton("Save Current Profile");
+		startScanControlBox.add(updateButton);
+		
+		saveAsButton = new JButton("Save As...");
+		startScanControlBox.add(saveAsButton);
+		
+		saveStrut = Box.createHorizontalStrut(90);
+		startScanControlBox.add(saveStrut);
+		
 		startScanButton = new JButton("Start Scan");
 		startScanControlBox.add(startScanButton);
 		
@@ -349,6 +381,28 @@ public class MainAppWindow2 extends JFrame {
 		 * Define the behavior of the UI components within the profile pane
 		 * portion of the split pane.		
 		 */
+		updateButton.addActionListener(new AbstractAction() {
+
+			@Override
+			public void actionPerformed (ActionEvent arg0) {
+				populateProfileDetails();
+			}
+			
+		});
+		
+		profileTabbedPane.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged (ChangeEvent e) {
+
+				if (reportTabbedPane.getSelectedIndex() == 0) {
+					System.out.println("Summary tab selected");
+					populateProfileSummary();
+				}
+			}
+			
+		});
+		
 		startScanButton.addActionListener(new AbstractAction () {
 
 			@Override
@@ -385,7 +439,8 @@ public class MainAppWindow2 extends JFrame {
 				
 				FilterBuilderWindow filterBuilderWindow =
 						new FilterBuilderWindow(MainAppWindow2.this, filtersListModel);
-				populateProfileSummary();
+				//populateProfileSummary();
+				
 			}
 			
 		});
@@ -492,6 +547,22 @@ public class MainAppWindow2 extends JFrame {
 			
 		});
 		
+//		ChangeListener selectionChangeListener = new ChangeListener() {
+//
+//			@Override
+//			public void stateChanged (ChangeEvent arg0) {
+//				populateProfileSummary();
+//			}
+//			
+//		};
+//		
+//		scanSubFoldersCheckBox.addChangeListener(selectionChangeListener);
+//		scanHiddenFoldersCheckBox.addChangeListener(selectionChangeListener);
+//		scanReadOnlyFoldersCheckBox.addChangeListener(selectionChangeListener);
+//		indexInclusivelyCheckBox.addChangeListener(selectionChangeListener);
+
+		
+		
 		/*
 		 * Defines the behavior of the menu bar items.
 		 */
@@ -532,6 +603,9 @@ public class MainAppWindow2 extends JFrame {
 				indexInclusivelyCheckBox.isSelected(), scanSubFoldersCheckBox.isSelected(),
 				scanReadOnlyFoldersCheckBox.isSelected(), scanHiddenFoldersCheckBox.isSelected()));
 		
+		detectionProfile.setName(nameTextField.getText());
+		detectionProfile.setDescription(descriptionTextArea.getText());
+		
 		//Add the current entries within the filter list to the detection profile
 		for (int i = 0; i < filtersListModel.getSize(); i++) {
 			detectionProfile.getFilters().add(filtersListModel.get(i).getContentIndexFilter());
@@ -563,6 +637,9 @@ public class MainAppWindow2 extends JFrame {
 		Profile profile;
 		
 		profileComboBox.setModel(new DefaultComboBoxModel<ProfileEntry>() );
+		
+		((DefaultComboBoxModel<ProfileEntry>)profileComboBox.getModel()).addElement(
+				new ProfileEntry(new Profile("Select a profile or define your own...", "Does Something Wonderful")));
 		
 		for (HashableFile file : profileIndex) {
 
@@ -599,9 +676,8 @@ public class MainAppWindow2 extends JFrame {
 			Profile profile = profileComboBox.getModel().getElementAt(profileComboBox.getSelectedIndex())
 					.getProfile();
 			
-//			summaryTextArea.setText("");
-//			summaryTextArea.append(profile.getDetailedDescription());
-			
+			nameTextField.setText(profile.getName());
+			descriptionTextArea.setText(profile.getDescription());
 			scanSubFoldersCheckBox.setSelected(profile.getSettings().getIndexRecursively());
 			scanHiddenFoldersCheckBox.setSelected(profile.getSettings().getIndexHiddenFolders());
 			scanReadOnlyFoldersCheckBox.setSelected(profile.getSettings().getIndexReadOnlyFolders());
