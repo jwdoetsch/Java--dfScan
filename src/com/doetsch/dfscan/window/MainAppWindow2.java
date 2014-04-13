@@ -36,6 +36,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -46,6 +47,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JSeparator;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.xml.sax.SAXException;
 
@@ -71,9 +74,7 @@ public class MainAppWindow2 extends JFrame {
 	private JMenuBar menuBar;
 	private Box profileSelectionBox;
 	private JComboBox<ProfileEntry> profileComboBox;
-	private JButton updateButton;
-	private JButton saveAsButton;
-	private JButton renameButton;
+	private JButton saveButton;
 	private Box startScanControlBox;
 	private JButton startScanButton;
 	private Component startScanRightGlue;
@@ -160,7 +161,11 @@ public class MainAppWindow2 extends JFrame {
 	private void initComponents() {
 		setTitle("dfScan");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1026, 768);
+		//setBounds(100, 100, 1026, 768);
+		setSize(1026, 768);
+		setLocationRelativeTo(null);
+		
+		
 		
 		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -223,9 +228,6 @@ public class MainAppWindow2 extends JFrame {
 		
 		refreshButton = new JButton("Refresh");
 		profileSelectionBox.add(refreshButton);
-		
-		renameButton = new JButton("Rename");
-		profileSelectionBox.add(renameButton);
 		
 		profileTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		profilePanel.add(profileTabbedPane, BorderLayout.CENTER);
@@ -352,11 +354,8 @@ public class MainAppWindow2 extends JFrame {
 		startScanLeftGlue = Box.createHorizontalGlue();
 		startScanControlBox.add(startScanLeftGlue);
 		
-		updateButton = new JButton("Save Current Profile");
-		startScanControlBox.add(updateButton);
-		
-		saveAsButton = new JButton("Save As...");
-		startScanControlBox.add(saveAsButton);
+		saveButton = new JButton("Save Current Settings & Options");
+		startScanControlBox.add(saveButton);
 		
 		saveStrut = Box.createHorizontalStrut(90);
 		startScanControlBox.add(saveStrut);
@@ -381,7 +380,16 @@ public class MainAppWindow2 extends JFrame {
 		 * Define the behavior of the UI components within the profile pane
 		 * portion of the split pane.		
 		 */
-		updateButton.addActionListener(new AbstractAction() {
+		refreshButton.addActionListener(new AbstractAction() {
+
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				populateProfileDetails();
+			}
+			
+		});
+		
+		saveButton.addActionListener(new AbstractAction() {
 
 			@Override
 			public void actionPerformed (ActionEvent arg0) {
@@ -428,6 +436,36 @@ public class MainAppWindow2 extends JFrame {
 					populateProfileDetails();
 				}
 				
+			}
+			
+		});
+		
+		saveButton.addActionListener(new AbstractAction() {
+
+			@Override
+			public void actionPerformed (ActionEvent arg0) {
+				
+				Profile profile = buildCurrentDetectionProfile();				
+				String checkMessage = "Are you sure you'd like to save the current settings"
+						+ " and options under the profile name \"" + profile.getName() + "\"?"; 
+				String checkTitle = "Save Confirmation";
+				
+				if (JOptionPane.showConfirmDialog(MainAppWindow2.this, checkMessage,
+						checkTitle, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+					
+					try {
+						Profile.save(profile);
+
+					} catch (TransformerFactoryConfigurationError e) {
+						e.printStackTrace();
+
+					} catch (TransformerException e) {
+						e.printStackTrace();
+					}
+					
+					populateComboBoxProfiles();
+					
+				}
 			}
 			
 		});

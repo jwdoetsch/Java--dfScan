@@ -4,6 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -37,8 +41,12 @@ import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 import javax.swing.ButtonGroup;
 import javax.swing.UIManager;
+import javax.swing.Box;
 
-public class FilterBuilderWindow extends OxideFrame {
+import java.awt.Window.Type;
+import java.awt.Dimension;
+
+public class FilterBuilderWindow extends JFrame {
 
 	private JPanel contentPane;
 	private JComboBox<String> comboBoxFilterType;
@@ -52,35 +60,55 @@ public class FilterBuilderWindow extends OxideFrame {
 	private JButton buttonClose;
 	private DefaultListModel<FilterListEntry> listModelFilters;
 	private Component parentFrame;
+	private Box verticalBox;
+	private Box horizontalBox;
+	private Box horizontalBox_1;
+	private Box horizontalBox_2;
+	private Box horizontalBox_3;
+	private Component rigidArea;
+	private Component rigidArea_1;
 	
 	/**
 	 * Create the frame.
 	 */
-	public FilterBuilderWindow (Component mainAppWindow2, DefaultListModel<FilterListEntry> listModel) {
-		super(false, new OxideDefaultSkin());
-		
+	public FilterBuilderWindow (Component parentFrame, DefaultListModel<FilterListEntry> listModel) {
+
+		this.parentFrame = parentFrame;		
+		this.listModelFilters = listModel;
+		newFilter = null;
+
 		initComponents();
 		setBehavior();
 		
-		this.parentFrame = mainAppWindow2;
-		this.listModelFilters = listModel;
-		newFilter = null;
-		mainAppWindow2.setEnabled(false);
+		parentFrame.setEnabled(false);
 	}
 
 	private void initComponents () {
 		setTitle("Build filter...");
-		setBounds(100, 100, 480, 156);
+		setBounds(100, 100, 498, 160);
+		setLocationRelativeTo(parentFrame);
+		setResizable(false);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
 		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
 
-		centerInViewport();
+		//centerInViewport();
 
 		setVisible(true);
-		contentPane = this.getContentPane();
 		
-		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
+		ButtonGroup radioButtonGroup = new ButtonGroup();
 		
-		comboBoxFilterType = oxideComponentFactory.createComboBox();
+		verticalBox = Box.createVerticalBox();
+		verticalBox.setBorder(new EmptyBorder(6, 6, 6, 6));
+		getContentPane().add(verticalBox, BorderLayout.NORTH);
+		
+		horizontalBox = Box.createHorizontalBox();
+		horizontalBox.setBorder(new EmptyBorder(0, 0, 6, 0));
+		verticalBox.add(horizontalBox);
+		
+		
+		comboBoxFilterType = new JComboBox<String>();
+		horizontalBox.add(comboBoxFilterType);
 		comboBoxFilterType.setModel(
 				new DefaultComboBoxModel<String>(new String[] {
 						"File name contains ...", "File path contains ...",
@@ -88,57 +116,115 @@ public class FilterBuilderWindow extends OxideFrame {
 						"File size is greater than or equal to ...", 
 						"File is hidden", "File is read-only"}));
 		comboBoxFilterType.setBounds(12, 12, 456, 24);
-		contentPane.add(comboBoxFilterType);
 		
-		textFieldFilterValue = oxideComponentFactory.createTextField();
+		horizontalBox_1 = Box.createHorizontalBox();
+		horizontalBox_1.setBorder(new EmptyBorder(0, 0, 6, 0));
+		verticalBox.add(horizontalBox_1);
+		
+		labelFilterValue = new JLabel("Qualifying Value: ");
+		horizontalBox_1.add(labelFilterValue);
+		labelFilterValue.setBounds(12, 48, 138, 24);
+		
+		textFieldFilterValue = new JTextField();
+		horizontalBox_1.add(textFieldFilterValue);
 		textFieldFilterValue.setBounds(156, 48, 312, 24);
-		contentPane.add(textFieldFilterValue);
 		textFieldFilterValue.setColumns(10);
 		
-		buttonAdd = oxideComponentFactory.createButton();
-		buttonAdd.setText("Add");
-		buttonAdd.setBounds(12, 120, 222, 24);
-		contentPane.add(buttonAdd);
+		horizontalBox_2 = Box.createHorizontalBox();
+		horizontalBox_2.setBorder(new EmptyBorder(0, 0, 6, 0));
+		verticalBox.add(horizontalBox_2);
 		
-		labelFilterValue = oxideComponentFactory.createLabel("Qualifying Value:");
-		labelFilterValue.setBounds(12, 48, 138, 24);
-		contentPane.add(labelFilterValue);
-		
-		radioButtonFilterInclusively = oxideComponentFactory.createRadioButton();
+		radioButtonFilterInclusively = new JRadioButton();
+		horizontalBox_2.add(radioButtonFilterInclusively);
 		radioButtonFilterInclusively.setText("Apply filter inclusively");
 		radioButtonFilterInclusively.setSelected(true);
 		buttonGroup.add(radioButtonFilterInclusively);
 		radioButtonFilterInclusively.setHorizontalAlignment(SwingConstants.CENTER);
 		radioButtonFilterInclusively.setBounds(12, 84, 228, 24);
-		contentPane.add(radioButtonFilterInclusively);
+		radioButtonGroup.add(radioButtonFilterInclusively);
 		
-		radioButtonFilterExclusively = oxideComponentFactory.createRadioButton();
+		rigidArea_1 = Box.createRigidArea(new Dimension(20, 20));
+		horizontalBox_2.add(rigidArea_1);
+		
+		radioButtonFilterExclusively = new JRadioButton();
+		horizontalBox_2.add(radioButtonFilterExclusively);
 		radioButtonFilterExclusively.setText("Apply filter exclusively");
 		buttonGroup.add(radioButtonFilterExclusively);
 		radioButtonFilterExclusively.setHorizontalAlignment(SwingConstants.CENTER);
 		radioButtonFilterExclusively.setBounds(240, 84, 228, 24);
-		contentPane.add(radioButtonFilterExclusively);
-		
-		ButtonGroup radioButtonGroup = new ButtonGroup();
 		radioButtonGroup.add(radioButtonFilterExclusively);
-		radioButtonGroup.add(radioButtonFilterInclusively);
 		
-		buttonClose = oxideComponentFactory.createButton();
-		buttonClose.setText("Close");
+		horizontalBox_3 = Box.createHorizontalBox();
+		verticalBox.add(horizontalBox_3);
+		
+		buttonAdd = new JButton("Add");
+		horizontalBox_3.add(buttonAdd);
+		buttonAdd.setBounds(12, 120, 222, 24);
+		
+		rigidArea = Box.createRigidArea(new Dimension(20, 20));
+		horizontalBox_3.add(rigidArea);
+		
+		buttonClose = new JButton("Close");
+		horizontalBox_3.add(buttonClose);
 		buttonClose.setBounds(246, 120, 222, 24);
-		getContentPane().add(buttonClose);
 		
 	}
 	
 	private void setBehavior () {
 		
-		setCloseButtonBehavior(new AbstractAction() {
+//		setCloseButtonBehavior(new AbstractAction() {
+//
+//			@Override
+//			public void actionPerformed (ActionEvent e) {
+//
+//				parentFrame.setEnabled(true);
+//				dispose();
+//			}
+//			
+//		});
+//		
+		
+		this.addWindowListener(new WindowListener() {
 
 			@Override
-			public void actionPerformed (ActionEvent e) {
+			public void windowActivated (WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
 
-				parentFrame.setEnabled(true);
-				dispose();
+			@Override
+			public void windowClosed (WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosing (WindowEvent arg0) {
+				closeAndUnlock();
+			}
+
+			@Override
+			public void windowDeactivated (WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeiconified (WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowIconified (WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowOpened (WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
 			}
 			
 		});
@@ -152,8 +238,20 @@ public class FilterBuilderWindow extends OxideFrame {
 			
 		});
 		
-		buttonClose.addActionListener(getCloseButtonBehavior());
+		buttonClose.addActionListener(new AbstractAction() {
+
+			@Override
+			public void actionPerformed (ActionEvent arg0) {
+				closeAndUnlock();
+			}
+			
+		});
 		
+	}
+	
+	private void closeAndUnlock () {
+		parentFrame.setEnabled(true);
+		dispose();
 	}
 	
 	private void saveFilter () {
@@ -216,7 +314,6 @@ public class FilterBuilderWindow extends OxideFrame {
 		
 		listModelFilters.addElement(new FilterListEntry(newFilter));
 		
-		getCloseButtonBehavior().actionPerformed(null);
 	}
 
 	public ContentIndexFilter getNewFilter () {

@@ -349,13 +349,26 @@ public class Profile {
 
 
 	/**
-	 * Formats and saves an XML representation of the given Profile.
+	 * Formats and saves an XML representation of the given profile at a path
+	 * defined by the profile's name.
+	 * 
+	 * @param profile
+	 * @throws TransformerFactoryConfigurationError
+	 * @throws TransformerException
+	 */
+	public static void save (Profile profile) throws TransformerFactoryConfigurationError, TransformerException {
+		save(profile, fileNameTransformer(profile.getName()) + ".dfscan.profile.xml");
+	}
+	
+	/**
+	 * Formats and saves an XML representation of the given Profile at the
+	 * given path.
 	 * 
 	 * @param profile the Profile to save
 	 * @throws TransformerFactoryConfigurationError 
 	 * @throws TransformerException 
 	 */
-	public static void save (Profile profile) throws TransformerFactoryConfigurationError, TransformerException {
+	public static void save (Profile profile, String path) throws TransformerFactoryConfigurationError, TransformerException {
 		
 		DocumentBuilderFactory docBuilderFactory;
 		DocumentBuilder docBuilder;
@@ -460,8 +473,6 @@ public class Profile {
 		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
 
-		String fileName = fileNameTransformer(profile.getName());
-		
 		File resultsFolder = new File("profiles");
 		if (!resultsFolder.exists()) {
 			resultsFolder.mkdir();				
@@ -469,7 +480,7 @@ public class Profile {
 		
 		transformer.transform(new DOMSource(document),
 				new StreamResult(
-						new File("profiles/" + fileName + ".dfscan.profile.xml")));
+						new File("profiles/" + path)));
 	}
 	
 	private static String fileNameTransformer (String sourceName) {
