@@ -60,8 +60,9 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.Box;
 
-public class ResultsWindow extends OxideFrame {
+public class ResultsPanel extends TabbedPanel {
 
 	/*
 	 * A table cell renderer that defines a cell's background color
@@ -214,20 +215,24 @@ public class ResultsWindow extends OxideFrame {
 	private Report resultsReport;
 	private JButton buttonMove;
 	private JComboBox<String> comboBoxSortBy;
-	private JLabel label;
 	private JLabel label_1;
 	private JLabel label_2;
-	private JPanel panel;
-	private JLabel labelStatusBar;
 	private JComboBox comboBoxSelector;
 	private JButton buttonDelete;
+	private Box horizontalBox;
+	private Box verticalBox;
+	private Box verticalBox_1;
+	private Box horizontalBox_1;
+	private Component glue;
 
 	/**
 	 * Create the frame.
 	 */
-	public ResultsWindow(Report resultsReport) {
+	public ResultsPanel(Report resultsReport) {
 
-		super(false, new OxideDefaultSkin());
+		//super(false, new OxideDefaultSkin());
+		super("");
+		setBorder(new EmptyBorder(6, 6, 6, 6));
 		
 		this.resultsReport = resultsReport;
 		
@@ -239,54 +244,21 @@ public class ResultsWindow extends OxideFrame {
 
 	protected void initComponents() {
 		
-		setTitle("Results for scan completed on " + resultsReport.getFinishDate()
-				+ " at " + resultsReport.getFinishTime());
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
+//		setTitle("Results for scan completed on " + resultsReport.getFinishDate()
+//				+ " at " + resultsReport.getFinishTime());
+//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
 
+		super.setTabTitle("Results " + resultsReport.getFinishDate()
+				+ " at " + resultsReport.getFinishTime());
+		
 		setBounds(100, 100, 864, 552);
+		setLayout(new BorderLayout(0, 0));
 		
-		centerInViewport();
-		contentPane = this.getContentPane();
-		
-		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
 		
 		scrollPaneDuplicateFiles = new JScrollPane();
 		scrollPaneDuplicateFiles.setBounds(12, 126, 840, 354);
-		contentPane.add(scrollPaneDuplicateFiles);
-		
-		buttonMove = oxideComponentFactory.createButton();
-		buttonMove.setText("Move Selected Files...");
-		buttonMove.setBounds(12, 492, 414, 24);
-		contentPane.add(buttonMove);
-		
-
-		comboBoxSortBy = oxideComponentFactory.createComboBox();
-		comboBoxSortBy.setVisible(false);
-		comboBoxSortBy.setEnabled(false);
-		comboBoxSortBy.setModel(new DefaultComboBoxModel<String>(new String[] {"Sort By...", "Size (Ascending)", "Size (Descending)", "Name (Ascending)", "Name (Descending)"}));
-		comboBoxSortBy.setBounds(282, 60, 570, 24);
-		contentPane.add(comboBoxSortBy);
-		
-		label = oxideComponentFactory.createLabel("");
-		label.setOpaque(true);
-		label.setBackground(getOxideSkin().getDecorationBorderColor());
-		label.setBounds(0, 42, 864, 6);
-		getContentPane().add(label);
-		
-		label_1 = oxideComponentFactory.createLabel("");
-		label_1.setBounds(12, 12, 846, 18);
-		label_1.setFont(new Font("Arial", Font.PLAIN, 15));
-		getContentPane().add(label_1);
-		label_1.setText("Scan started by " + resultsReport.getUser()
-				+ " on host " + resultsReport.getHost()
-				+ " at " + resultsReport.getStartTime()
-				+ " on " + resultsReport.getStartDate());
-		
-		label_2 = oxideComponentFactory.createLabel("");
-		label_2.setBounds(12, 96, 840, 18);
-		label_2.setFont(new Font("Arial", Font.PLAIN, 15));
-		getContentPane().add(label_2);
+		add(scrollPaneDuplicateFiles, BorderLayout.CENTER);
 		
 		int fileCount = 0;
 		for (ContentIndex index : resultsReport.getGroups()) {
@@ -295,45 +267,52 @@ public class ResultsWindow extends OxideFrame {
 			}
 		}
 		
+		verticalBox = Box.createVerticalBox();
+		add(verticalBox, BorderLayout.NORTH);
+		
+		label_1 = new JLabel("");
+		verticalBox.add(label_1);
+				label_1.setText("Scan started by " + resultsReport.getUser()
+				+ " on host " + resultsReport.getHost()
+				+ " at " + resultsReport.getStartTime()
+				+ " on " + resultsReport.getStartDate());
+		
+		label_2 = new JLabel("");
+		verticalBox.add(label_2);
 		label_2.setText("Found " + fileCount + " duplicate files in "
 				+ resultsReport.getGroups().size() + " common groups");
 		
-		panel = new JPanel();
-		panel.setBackground(new Color(216, 216, 216));
-		panel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		panel.setBounds(0, 528, 864, 24);
-		getContentPane().add(panel);
-		panel.setLayout(null);
+		horizontalBox_1 = Box.createHorizontalBox();
+		verticalBox.add(horizontalBox_1);
 		
-		labelStatusBar = oxideComponentFactory.createLabel("");
-		labelStatusBar.setBounds(0, 0, 864, 24);
-		panel.add(labelStatusBar);
-		
-		comboBoxSelector = oxideComponentFactory.createComboBox();
+		comboBoxSelector = new JComboBox<String>();
+		horizontalBox_1.add(comboBoxSelector);
 		comboBoxSelector.setModel(new DefaultComboBoxModel(new String[] {"Default Selection", "Select All Entries", "Select None"}));
 		comboBoxSelector.setBounds(12, 60, 258, 24);
-		getContentPane().add(comboBoxSelector);
 		
-		buttonDelete = oxideComponentFactory.createButton();
-		buttonDelete.setText("Delete Selected...");
+		glue = Box.createGlue();
+		horizontalBox_1.add(glue);
+		
+
+		comboBoxSortBy = new JComboBox<String>();
+		horizontalBox_1.add(comboBoxSortBy);
+		comboBoxSortBy.setModel(new DefaultComboBoxModel<String>(new String[] {"Sort By...", "Size (Ascending)", "Size (Descending)", "Name (Ascending)", "Name (Descending)"}));
+		comboBoxSortBy.setBounds(282, 60, 570, 24);
+		
+		verticalBox_1 = Box.createVerticalBox();
+		add(verticalBox_1, BorderLayout.SOUTH);
+		
+		horizontalBox = Box.createHorizontalBox();
+		verticalBox_1.add(horizontalBox);
+		
+		buttonDelete = new JButton("Delete Selected...");
+		horizontalBox.add(buttonDelete);
 		buttonDelete.setBounds(438, 492, 414, 24);
-		getContentPane().add(buttonDelete);
 		
+		buttonMove = new JButton("Move Selected Files...");
+		horizontalBox.add(buttonMove);
 		
 		buildTable();
-//		table = (new GroupTableBuilder(resultsReport.getGroups())).build();
-//		table.addMouseListener(new MouseAdapter() {
-//
-//			public void mousePressed (MouseEvent e) {
-//				copyPathToClipboard(e);
-//			}
-//			
-//		});
-//		
-//		table.setShowVerticalLines(false);
-//		table.setRowSelectionAllowed(true);
-//		table.setColumnSelectionAllowed(false);
-		
 	}
 
 	private void buildTable () {
@@ -366,7 +345,7 @@ public class ResultsWindow extends OxideFrame {
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			StringSelection clipBoardData = new StringSelection(path);
 			clipboard.setContents(clipBoardData, clipBoardData);
-			labelStatusBar.setText("Copied selected path to clipboard: " + path);		
+			//labelStatusBar.setText("Copied selected path to clipboard: " + path);		
 		}
 	}
 	
@@ -417,7 +396,7 @@ public class ResultsWindow extends OxideFrame {
 
 				File destinationPath = null;
 				ArrayList<File> pathList = getSelectedEntries();
-				FolderChooser folderChooser = new FolderChooser(ResultsWindow.this,
+				FolderChooser folderChooser = new FolderChooser(ResultsPanel.this,
 						new File(System.getProperty("user.home")),
 								"Select destination folder...");
 				
@@ -434,7 +413,7 @@ public class ResultsWindow extends OxideFrame {
 					try {
 						Files.move(FileSystems.getDefault().getPath(path.getPath()),
 								FileSystems.getDefault().getPath(destinationPath.getPath() + "/" + path.getName()));
-						labelStatusBar.setText("Moved " + path.getPath() + ".");
+						//labelStatusBar.setText("Moved " + path.getPath() + ".");
 
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
@@ -460,7 +439,7 @@ public class ResultsWindow extends OxideFrame {
 					
 					try {
 						Files.deleteIfExists(FileSystems.getDefault().getPath(path.getPath()));
-						labelStatusBar.setText("Deleted " + path.getPath() + ".");
+						//labelStatusBar.setText("Deleted " + path.getPath() + ".");
 
 						
 					} catch (IOException e1) {
@@ -494,8 +473,7 @@ public class ResultsWindow extends OxideFrame {
 	}
 	
 	private void setDefaultValues () {
-		setVisible(true);
-		setResizable(false);
+//		setVisible(true);
 		
 		int fileCount = 0;
 		for (ContentIndex i : resultsReport.getGroups()) {
@@ -504,6 +482,18 @@ public class ResultsWindow extends OxideFrame {
 			}
 		}
 		
+		
+	}
+
+	@Override
+	public void tabButtonAction () {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void closePanel () {
+		// TODO Auto-generated method stub
 		
 	}
 }

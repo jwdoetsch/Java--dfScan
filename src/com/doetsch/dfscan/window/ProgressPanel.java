@@ -181,12 +181,17 @@ public class ProgressPanel extends TabbedPanel {
 						 */
 						if (!detectionTask.isCancelled()) {
 							try {
-								new ResultsWindow(detectionTask.get());
+								ResultsPanel resultsPanel = new ResultsPanel(detectionTask.get());
+								parentPane.addTab("", null, resultsPanel, null);
+								parentPane.setTabComponentAt(
+										parentPane.indexOfComponent(resultsPanel), resultsPanel.getTabAsComponent());
+								parentPane.setSelectedComponent(resultsPanel);
 								
 							} catch (InterruptedException | ExecutionException e1) {
 								System.out.println("Report not retrievable from the detection task!");
 								e1.printStackTrace();
-							}		
+							}
+							
 							
 						/*
 						 * If the task reports finished because it has been interrupted...
