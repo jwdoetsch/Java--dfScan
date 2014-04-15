@@ -1,400 +1,434 @@
 package com.doetsch.dfscan.window;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.Image;
-import java.awt.Point;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.AbstractAction;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.plaf.basic.BasicButtonUI;
+import javax.swing.plaf.basic.BasicLabelUI;
+import javax.swing.JSplitPane;
 import javax.swing.UIManager;
-import javax.swing.JTextArea;
 
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
+import java.awt.Dimension;
+
+import javax.swing.JMenuBar;
+import javax.swing.JComboBox;
+import javax.swing.Box;
+import javax.swing.JButton;
+
+import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
-
-import javax.swing.JLabel;
-
-import java.awt.CardLayout;
+import java.awt.Component;
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
+import javax.swing.JTextArea;
+import javax.swing.JTabbedPane;
+import javax.swing.JMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JCheckBox;
+import javax.swing.JList;
+import javax.swing.JSeparator;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.xml.sax.SAXException;
 
 import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.core.Profile;
-import com.doetsch.dfscan.core.Report;
+import com.doetsch.dfscan.core.SettingsContainer;
+import com.doetsch.dfscan.filter.ContentIndexFilter;
 import com.doetsch.dfscan.filter.NameContainsFilter;
 import com.doetsch.dfscan.util.ContentIndex;
+import com.doetsch.dfscan.util.FolderChooser;
 import com.doetsch.dfscan.util.HashableFile;
-import com.doetsch.oxide.*;
 
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.ListSelectionModel;
-import javax.swing.JEditorPane;
+import javax.swing.border.EtchedBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.border.TitledBorder;
 
-import java.awt.Cursor;
+public class MainWindow extends JFrame {
 
-import javax.swing.border.BevelBorder;
-import javax.swing.border.SoftBevelBorder;
+	private JPanel contentPane;
+	private JSplitPane splitPane; 
+	private JPanel reportPanel;
+	private JPanel profilePanel;
+	private JMenuBar menuBar;
+	private Box profileSelectionBox;
+	private JComboBox<ProfileEntry> profileComboBox;
+	private JButton saveButton;
+	private Box startScanControlBox;
+	private JButton startScanButton;
+	private Component startScanRightGlue;
+	private Component startScanLeftGlue;
+	private JScrollPane summaryScrollPane;
+	private JTextArea summaryTextArea;
+	private JTabbedPane profileTabbedPane;
+	private JPanel summaryPanel;
+	private JTabbedPane reportTabbedPane;
+	private JMenu fileMenu;
+	private JPanel foldersPanel;
+	private Box foldersBox;
+	private Box indexingOptionsBox;
+	private JCheckBox scanSubFoldersCheckBox;
+	private JCheckBox scanHiddenFoldersCheckBox;
+	private JCheckBox scanReadOnlyFoldersCheckBox;
+	private Component indexingOptionsTopGlue;
+	private Component indexingOptionsBottonGlue;
+	private Box foldersControlBox;
+	private JButton addFolderButton;
+	private JButton removeFolderButton;
+	private JScrollPane foldersScrollPane;
+	private JList<String> foldersList;
+	private DefaultListModel<String> foldersListModel;
+	private JPanel filtersPanel;
+	private Box filtersBox;
+	private Box filteringOptionsBox;
+	private Box filtersControlBox;
+	private JScrollPane filtersScrollPane;
+	private JList<FilterListEntry> filtersList;
+	private DefaultListModel<FilterListEntry> filtersListModel;
+	private JButton addFilterButton;
+	private JButton removeFilterButton;
+	private JCheckBox indexInclusivelyCheckBox;
+	private Component filteringOptionsTopGlue;
+	private Component filteringOptionsBottomGlue;
+	private JMenuItem openResultsMenuItem;
+	private JMenuItem exitMenuItem;
+	private JSeparator fileMenuSeparator;
+	private JMenu helpMenu;
+	private JMenuItem aboutMenuItem;
+	private JMenuItem updateMenuItem;
+	private JSeparator helpMenuSeparator;
+	private JMenuItem guideMenuItem;
+	private JButton moveUpButton;
+	private JButton moveDownButton;
+	private Component verticalStrut;
+	private JButton refreshButton;
+	private JPanel headerPanel;
+	private JTextField nameTextField;
+	private JTextArea descriptionTextArea;
+	private JMenuItem wizardMenuItem;
 
-public class MainWindow extends OxideFrame {
-
-	private OxideMenuButton buttonHelp;
-	private OxideMenuButton buttonScan;
-	private OxideMenuButton buttonHistory;
-	private JLabel labelMenuBackground;
-	private JLabel labelMenuSeparator;
-	private JPanel panelDeck;
-	private JPanel panelHelp;
-	private JPanel panelScan;
-	private JPanel panelHistory;
-	private ArrayList<Report> reportsHistory;
-	
-	private final String[] panelID = {"home", "scan", "history"};
-	private JButton buttonEdit;
-	private JButton buttonAdd;
-	private JComboBox<ProfileEntry> comboBoxProfile;
-	private JPanel panelProfileDetails;
-	private JButton buttonStart;
-	private JScrollPane scrollPane;
-	private JTextArea textArea;
-	private JScrollPane scrollPaneHistory;
-	private JTable tableHistory;
-	private JScrollPane scrollPaneHelp;
-	private JEditorPane editorPaneHelp;
-	private JLabel labelReportCount;
+	/**
+	 * Launch the application.
+	 */
+	public static void main (String[] args) {
+		try {
+			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		EventQueue.invokeLater(new Runnable() {
+			public void run () {
+				try {
+					MainWindow frame = new MainWindow();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 
 	/**
 	 * Create the frame.
 	 */
 	public MainWindow () {
-		super(true, new OxideDefaultSkin());
-	
 		initComponents();
-		defineBehavior();
+		setBehavior();
+		setDefaultValues();
 	}
 	
 	private void initComponents() {
-		setTitle("dfScan v0.01");
+		setTitle("dfScan");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 720, 450);
-		centerInViewport();
-		//super.centerInViewport();
-		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
+		setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
+		setSize(1026, 768);
+		setLocationRelativeTo(null);
+		setVisible(true);
 		
-		OxideComponentFactory oxideComponentFactory = new OxideComponentFactory(getOxideSkin());
 		
-		buttonHelp = new OxideMenuButton((String) null, getOxideSkin());
-		buttonHelp.setToolTipText("Opens the dfScan User Guide.");
-		buttonHelp.setText("Help");
-		buttonHelp.setBounds(0, 0, 120, 90);
-		getContentPane().add(buttonHelp);
 		
-		buttonScan = new OxideMenuButton((String) null, getOxideSkin());
-		buttonScan.setText("Scan");
-		buttonScan.setBounds(0, 90, 120, 90);
-		getContentPane().add(buttonScan);
+		menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
 		
-		buttonHistory = new OxideMenuButton((String) null, getOxideSkin());
-		buttonHistory.setText("History");
-		buttonHistory.setBounds(0, 180, 120, 90);
-		getContentPane().add(buttonHistory);
+		fileMenu = new JMenu("File");
+		menuBar.add(fileMenu);
 		
-		labelMenuBackground = new JLabel("");
-		labelMenuBackground.setVisible(false);
-		labelMenuBackground.setOpaque(true);
-		labelMenuBackground.setBackground(getOxideSkin().getShadeColor1());
-		labelMenuBackground.setBounds(0, 0, 120, 450);
-		getContentPane().add(labelMenuBackground);
+		wizardMenuItem = new JMenuItem("Wizard");
+		fileMenu.add(wizardMenuItem);
 		
-		labelMenuSeparator = new JLabel("");
-		labelMenuSeparator.setBackground(getOxideSkin().getDecorationBorderColor());
-		labelMenuSeparator.setOpaque(true);
-		labelMenuSeparator.setBounds(120, 0, 6, 450);
-		getContentPane().add(labelMenuSeparator);
+		openResultsMenuItem = new JMenuItem("Open Results...");
+		fileMenu.add(openResultsMenuItem);
 		
-		panelDeck = new JPanel();
-		panelDeck.setBounds(126, 0, 594, 450);
-		getContentPane().add(panelDeck);
-		panelDeck.setLayout(new CardLayout(0, 0));
+		fileMenuSeparator = new JSeparator();
+		fileMenu.add(fileMenuSeparator);
 		
-		panelHelp = new JPanel();
-		panelDeck.add(panelHelp, panelID[0]);
-		panelHelp.setLayout(null);
+		exitMenuItem = new JMenuItem("Exit");
+		fileMenu.add(exitMenuItem);
 		
-		scrollPaneHelp = new JScrollPane();
-		scrollPaneHelp.setBounds(12, 12, 570, 426);
-		panelHelp.add(scrollPaneHelp);
+		helpMenu = new JMenu("Help");
+		menuBar.add(helpMenu);
 		
-		editorPaneHelp = new JEditorPane();
-		editorPaneHelp.setEditable(false);
-		try {
-			editorPaneHelp.setPage(DFScan.class.getResource("resources/docs/help.html"));
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		scrollPaneHelp.setViewportView(editorPaneHelp);
+		guideMenuItem = new JMenuItem("User Guide");
+		helpMenu.add(guideMenuItem);
 		
-		panelScan = new JPanel();
-		panelDeck.add(panelScan, panelID[1]);
-		panelScan.setLayout(null);
+		updateMenuItem = new JMenuItem("Check for Updates...");
+		helpMenu.add(updateMenuItem);
 		
-		buttonEdit = oxideComponentFactory.createButton();
-		buttonEdit.setText("Edit");
-		buttonEdit.setBounds(438, 12, 66, 24);
-		panelScan.add(buttonEdit);
+		helpMenuSeparator = new JSeparator();
+		helpMenu.add(helpMenuSeparator);
 		
-		buttonAdd = oxideComponentFactory.createButton();
-		buttonAdd.setText("Add");
-		buttonAdd.setBounds(516, 12, 66, 24);
-		panelScan.add(buttonAdd);
+		aboutMenuItem = new JMenuItem("About dfScan");
+		helpMenu.add(aboutMenuItem);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(12, 0, 0, 0));
+		setContentPane(contentPane);
+		contentPane.setLayout(new BorderLayout(0, 0));
 		
-		comboBoxProfile = oxideComponentFactory.createComboBox();
-		comboBoxProfile.setModel(new DefaultComboBoxModel<ProfileEntry>(new ProfileEntry[] {}));
-		comboBoxProfile.setBounds(12, 12, 414, 24);
-		panelScan.add(comboBoxProfile);
+		splitPane = new JSplitPane();
+		splitPane.setOneTouchExpandable(true);
+		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		contentPane.add(splitPane, BorderLayout.CENTER);
 		
-		panelProfileDetails = oxideComponentFactory.createTitledPanel("Profile Details");
-		panelProfileDetails.setBounds(12, 48, 570, 354);
-		panelScan.add(panelProfileDetails);
-		panelProfileDetails.setLayout(null);
+		reportPanel = new JPanel();
+		reportPanel.setPreferredSize(new Dimension(10, 400));
+		splitPane.setLeftComponent(reportPanel);
+		reportPanel.setLayout(new BorderLayout(0, 0));
 		
-		scrollPane = new JScrollPane();
-		scrollPane.setBounds(12, 30, 546, 312);
-		panelProfileDetails.add(scrollPane);
-		
-		//textArea = new JTextArea();
-		textArea = oxideComponentFactory.createTextArea();
-		textArea.setEditable(false);
-		textArea.setFont(getOxideSkin().getControlFontFace());
-		textArea.setForeground(getOxideSkin().getControlFontColor());
-		
-		scrollPane.setViewportView(textArea);
-		
-		buttonStart = oxideComponentFactory.createButton();
-		buttonStart.setText("Start");
-		buttonStart.setBounds(12, 414, 570, 24);
-		panelScan.add(buttonStart);
-		
-		panelHistory = new JPanel();
-		panelDeck.add(panelHistory, panelID[2]);
-		panelHistory.setLayout(null);
-		
-		labelReportCount = oxideComponentFactory.createLabel("");
-		labelReportCount.setBounds(12, 12, 570, 18);
-		panelHistory.add(labelReportCount);
-		
-		scrollPaneHistory = new JScrollPane();
-		scrollPaneHistory.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPaneHistory.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPaneHistory.setBounds(12, 42, 570, 396);
-		panelHistory.add(scrollPaneHistory);
-		
-		tableHistory = new JTable() {};
-		tableHistory.setDoubleBuffered(true);
-		tableHistory.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tableHistory.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		tableHistory.setShowVerticalLines(false);
-		tableHistory.setFillsViewportHeight(true);
-		populateHistoryTable();
-		
-		scrollPaneHistory.setViewportView(tableHistory);
-		
-	
+		reportTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		reportTabbedPane.setPreferredSize(new Dimension(0, 400));
+		reportPanel.add(reportTabbedPane, BorderLayout.CENTER);
 
+		profilePanel = new JPanel();
+		splitPane.setRightComponent(profilePanel);
+		profilePanel.setLayout(new BorderLayout(0, 0));
 		
-		tableHistory.addMouseListener(new MouseAdapter() {
+		profileSelectionBox = Box.createHorizontalBox();
+		profileSelectionBox.setBorder(new EmptyBorder(6, 6, 6, 6));
+		profilePanel.add(profileSelectionBox, BorderLayout.NORTH);
+		
+		profileComboBox = new JComboBox<ProfileEntry>();
+		profileSelectionBox.add(profileComboBox);
+		
+		refreshButton = new JButton("Refresh");
+		profileSelectionBox.add(refreshButton);
+		
+		saveButton = new JButton("Save Current Settings & Options");
+		profileSelectionBox.add(saveButton);
+		
+		profileTabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		profilePanel.add(profileTabbedPane, BorderLayout.CENTER);
+		
+		summaryPanel = new JPanel();
+		summaryPanel.setBorder(new EmptyBorder(6, 6, 6, 6));
+		profileTabbedPane.addTab("Summary", null, summaryPanel, null);
+		summaryPanel.setLayout(new BorderLayout(0, 0));
+		
+		summaryScrollPane = new JScrollPane();
+		summaryPanel.add(summaryScrollPane, BorderLayout.CENTER);
+		
+		summaryTextArea = new JTextArea();
+		summaryTextArea.setEditable(false);
+		summaryScrollPane.setViewportView(summaryTextArea);
+		
+		headerPanel = new JPanel();
+		headerPanel.setBorder(new EmptyBorder(6, 6, 6, 6));
+		profileTabbedPane.addTab("Header", null, headerPanel, null);
+		headerPanel.setLayout(new BorderLayout(0, 0));
+		
+		nameTextField = new JTextField();
+		headerPanel.add(nameTextField, BorderLayout.NORTH);
+		nameTextField.setColumns(10);
+		
+		descriptionTextArea = new JTextArea();
+		headerPanel.add(descriptionTextArea, BorderLayout.CENTER);
+		
+		foldersPanel = new JPanel();
+		foldersPanel.setBorder(new EmptyBorder(6, 6, 6, 6));
+		profileTabbedPane.addTab("Target Folders", null, foldersPanel, null);
+		foldersPanel.setLayout(new BorderLayout(0, 0));
+		
+		foldersBox = Box.createVerticalBox();
+		foldersPanel.add(foldersBox, BorderLayout.CENTER);
+		
+		foldersControlBox = Box.createHorizontalBox();
+		foldersBox.add(foldersControlBox);
+		
+		addFolderButton = new JButton("Add Folder");
+		foldersControlBox.add(addFolderButton);
+		
+		removeFolderButton = new JButton("Remove Folder");
+		foldersControlBox.add(removeFolderButton);
+		
+		foldersScrollPane = new JScrollPane();
+		foldersBox.add(foldersScrollPane);
+		
+		foldersList = new JList<String>();
+		foldersScrollPane.setViewportView(foldersList);
+		
+		foldersListModel = new DefaultListModel<String>();
+		foldersList.setModel(foldersListModel);
+		
+		indexingOptionsBox = Box.createVerticalBox();
+		foldersPanel.add(indexingOptionsBox, BorderLayout.EAST);
+		
+		indexingOptionsTopGlue = Box.createVerticalGlue();
+		indexingOptionsBox.add(indexingOptionsTopGlue);
+		
+		scanSubFoldersCheckBox = new JCheckBox("Scan sub-folders");
+		indexingOptionsBox.add(scanSubFoldersCheckBox);
+		
+		scanHiddenFoldersCheckBox = new JCheckBox("Scan hidden folders");
+		indexingOptionsBox.add(scanHiddenFoldersCheckBox);
+		
+		scanReadOnlyFoldersCheckBox = new JCheckBox("Scan read-only folders");
+		indexingOptionsBox.add(scanReadOnlyFoldersCheckBox);
 
-			public void mousePressed (MouseEvent e) {
-				JTable table = (JTable) e.getSource();
-				Point p = e.getPoint();
-				int row = table.rowAtPoint(p);
-				int col = table.columnAtPoint(p);
-				if ((row > -1) && (col > -1)) {
-					if (e.getClickCount() == 2) {
-						
-						new ResultsWindow(reportsHistory.get(row));
-						
-					}
-				}
-			}
-			
-		});
+		indexingOptionsBottonGlue = Box.createVerticalGlue();
+		indexingOptionsBox.add(indexingOptionsBottonGlue);
 		
+		filtersPanel = new JPanel();
+		filtersPanel.setBorder(new EmptyBorder(6, 6, 6, 6));
+		profileTabbedPane.addTab("Filters", null, filtersPanel, null);
+		filtersPanel.setLayout(new BorderLayout(0, 0));
 		
-		setMenuButtonColors(0);		
+		filtersBox = Box.createVerticalBox();
+		filtersPanel.add(filtersBox, BorderLayout.CENTER);
+		
+		filtersControlBox = Box.createHorizontalBox();
+		filtersBox.add(filtersControlBox);
+		
+		addFilterButton = new JButton("Add Filter");
+		filtersControlBox.add(addFilterButton);
+		
+		removeFilterButton = new JButton("Remove Filter");
+		filtersControlBox.add(removeFilterButton);
+		
+		filtersScrollPane = new JScrollPane();
+		filtersBox.add(filtersScrollPane);
+		
+		filtersList = new JList<FilterListEntry>();
+		filtersScrollPane.setViewportView(filtersList);
+		
+		filtersListModel = new DefaultListModel<FilterListEntry>();
+		filtersList.setModel(filtersListModel);
+		
+		filteringOptionsBox = Box.createVerticalBox();
+		filtersPanel.add(filteringOptionsBox, BorderLayout.EAST);
+		
+		filteringOptionsTopGlue = Box.createVerticalGlue();
+		filteringOptionsBox.add(filteringOptionsTopGlue);
+		
+		indexInclusivelyCheckBox = new JCheckBox("Index inclusively");
+		filteringOptionsBox.add(indexInclusivelyCheckBox);
+		
+		verticalStrut = Box.createVerticalStrut(20);
+		filteringOptionsBox.add(verticalStrut);
+		
+		moveUpButton = new JButton("Move Up");
+		filteringOptionsBox.add(moveUpButton);
+		
+		moveDownButton = new JButton("Move Down");
+		filteringOptionsBox.add(moveDownButton);
+		
+		filteringOptionsBottomGlue = Box.createVerticalGlue();
+		filteringOptionsBox.add(filteringOptionsBottomGlue);
+		
+		startScanControlBox = Box.createHorizontalBox();
+		startScanControlBox.setBorder(new EmptyBorder(0, 0, 6, 0));
+		profilePanel.add(startScanControlBox, BorderLayout.SOUTH);
+		
+		startScanLeftGlue = Box.createHorizontalGlue();
+		startScanControlBox.add(startScanLeftGlue);
+		
+		startScanButton = new JButton("Start Scan");
+		startScanControlBox.add(startScanButton);
+		
+		startScanRightGlue = Box.createHorizontalGlue();
+		startScanControlBox.add(startScanRightGlue);
+		splitPane.setDividerLocation(400);
+		
+		showUserGuide();
+//		UserGuidePanel welcomePanel = new UserGuidePanel(reportTabbedPane);
+//		reportTabbedPane.addTab("", null, welcomePanel, "Welcome Page");
+//		reportTabbedPane.setTabComponentAt(
+//				reportTabbedPane.indexOfComponent(welcomePanel), welcomePanel.getTabAsComponent());
 	}
 	
-
-	private void populateHistoryTable () {
-		
-		
-		
-		ContentIndex sourceIndex = new ContentIndex("results/");
-		ContentIndex reportIndex = (new NameContainsFilter(".dfscan.report.xml", true)).enforce(sourceIndex);
-		int reportCount = 0;
-		
-		reportsHistory = new ArrayList<Report>();
-
-		tableHistory.setColumnModel(new DefaultTableColumnModel() {
-			public void moveColumn (int column, int targetColumn) {
-			}
-		});
+	private void setBehavior () {
 		
 		/*
-		 * Build the table model
+		 * Define the behavior of the UI components within the profile pane
+		 * portion of the split pane.		
 		 */
-		DefaultTableModel tableModel = new DefaultTableModel( new Object[][] {}, new String[] {
-				"User", " Host", "Started On", "Results", "Finished On", "Elapsed Time"}) {
-			
-			boolean[] columnEditables =
-					new boolean[] {false, false, false, false, false, false};
-			
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return columnEditables[column];
-			}
-		};
-		
-		tableHistory.setModel(tableModel);
-		
-
-		
-		/*
-		 * Set column sizes
-		 */
-		//int[] columnWidths = {96, 96, 192, 192, 192, 192};
-		int[][] columnWidths = {{96, 96, 192, 192, 192, 192},
-								{64, 64, 64, 64, 64, 64}};
-		
-		for (int i = 0; i < 6; i++) {
-			tableHistory.getColumnModel().getColumn(i).setPreferredWidth(columnWidths[0][i]);
-			tableHistory.getColumnModel().getColumn(i).setMinWidth(columnWidths[1][i]);
-		}
-		
-
-	
-
-		/*
-		 * Iterate through the report index. Load the Profile at the current
-		 * file path and add the profile's details to the history table. 
-		 */
-		for (HashableFile file : reportIndex) {
-			
-			if (file.canRead()) {
-				reportsHistory.add(Report.load(file));
-				reportCount++;
-			}
-		}
-		
-		labelReportCount.setText("Found " + reportCount + " reports.");
-		
-		/*
-		 * Populate the table with report data		
-		 */
-		for (Report report : reportsHistory) {
-		
-			int fileCount = 0;
-			
-			for (ContentIndex groupIndex : report.getGroups()) {
-				fileCount += groupIndex.getSize();
-			}
-			
-			String results = "" + fileCount + " files ("
-					+ report.getGroups().size() + " groups)";
-			
-			tableModel.addRow(new Object[] {
-				report.getUser(),
-				report.getHost(),
-				report.getStartDate() + "    " + report.getStartTime(),
-				results,
-				report.getFinishDate() + "    " + report.getFinishTime(),
-				report.getDetectionTime()				
-			});
-
-		}
-				
-	}
-
-	private void defineBehavior () {
-
-		//Stop the application when the main window close button is pressed
-		setCloseButtonBehavior(new AbstractAction() {
-
-			@Override
-			public void actionPerformed (ActionEvent arg0) {
-				System.exit(0);
-			}
-			
-		}); 
-
-		buttonHelp.setActionListener(new AbstractAction() {
-
-			@Override
-			public void actionPerformed (ActionEvent arg0) {
-				setMenuButtonColors(0);
-			}
-			
-		});
-		
-		buttonScan.setActionListener(new AbstractAction() {
-
-			@Override
-			public void actionPerformed (ActionEvent arg0) {
-				setMenuButtonColors(1);
-			}
-			
-		});
-		
-		buttonHistory.setActionListener(new AbstractAction() {
-
-			@Override
-			public void actionPerformed (ActionEvent arg0) {
-				setMenuButtonColors(2);
-			}
-			
-		});
-		
-		buttonStart.addActionListener(new AbstractAction() {
+		refreshButton.addActionListener(new AbstractAction() {
 
 			@Override
 			public void actionPerformed (ActionEvent e) {
-				
+				populateProfileDetails();
+			}
+			
+		});
 		
-				if (comboBoxProfile.getSelectedIndex() > -1) {
-					//new ProgressWindow(comboBoxProfile.getItemAt(comboBoxProfile.getSelectedIndex()).getProfile());
+//		saveButton.addActionListener(new AbstractAction() {
+//
+//			@Override
+//			public void actionPerformed (ActionEvent arg0) {
+//				populateProfileDetails();
+//			}
+//			
+//		});
+		
+		profileTabbedPane.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged (ChangeEvent e) {
+
+				if (reportTabbedPane.getSelectedIndex() == 0) {
+					System.out.println("Summary tab selected");
+					populateProfileSummary();
 				}
+			}
+			
+		});
+		
+		startScanButton.addActionListener(new AbstractAction () {
+
+			@Override
+			public void actionPerformed (ActionEvent arg0) {
+				
+				ProgressPanel progressPanel = new ProgressPanel(buildCurrentDetectionProfile(), reportTabbedPane);
+				reportTabbedPane.addTab("", null, progressPanel, null);
+				reportTabbedPane.setTabComponentAt(
+						reportTabbedPane.indexOfComponent(progressPanel), progressPanel.getTabAsComponent());
+				reportTabbedPane.setSelectedComponent(progressPanel);
 				
 			}
 			
 		});
 		
-		comboBoxProfile.addActionListener(new AbstractAction () {
+		profileComboBox.addActionListener(new AbstractAction () {
 
 			@Override
 			public void actionPerformed (ActionEvent e) {
@@ -408,50 +442,231 @@ public class MainWindow extends OxideFrame {
 			
 		});
 		
-		buttonEdit.addActionListener(new AbstractAction() {
+		saveButton.addActionListener(new AbstractAction() {
 
+			@Override
+			public void actionPerformed (ActionEvent arg0) {
+				
+				Profile profile = buildCurrentDetectionProfile();				
+				String checkMessage = "Are you sure you'd like to save the current settings"
+						+ " and options under the profile name \"" + profile.getName() + "\"?"; 
+				String checkTitle = "Save Confirmation";
+				int currentProfileIndex = profileComboBox.getSelectedIndex();				
+				
+				if (JOptionPane.showConfirmDialog(MainWindow.this, checkMessage,
+						checkTitle, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+					
+					try {
+						Profile.save(profile);
+
+					} catch (TransformerFactoryConfigurationError e) {
+						e.printStackTrace();
+
+					} catch (TransformerException e) {
+						e.printStackTrace();
+					}
+					
+					populateComboBoxProfiles();
+					profileComboBox.setSelectedIndex(currentProfileIndex);
+					
+				}
+			}
+			
+		});
+		
+		addFilterButton.addActionListener(new AbstractAction () {
+			
 			@Override
 			public void actionPerformed (ActionEvent e) {
 				
-				editProfile();			
+				FilterBuilderWindow filterBuilderWindow =
+						new FilterBuilderWindow(MainWindow.this, filtersListModel);
+				//populateProfileSummary();
+				
 			}
 			
 		});
 		
-		buttonAdd.addActionListener(new AbstractAction() {
+		removeFilterButton.addActionListener(new AbstractAction () {
+
+			/*
+			 * Removes the filter list element at the selected index, provided
+			 * one is selected and available.
+			 */
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				
+				int index = filtersList.getSelectedIndex();
+				
+				if (index > -1) {
+					filtersListModel.removeElementAt(index);
+				}
+				populateProfileSummary();
+			}
+			
+		});
+		
+		moveUpButton.addActionListener(new AbstractAction () {
+
+			/*
+			 * Move the selected filter entry up the list
+			 */
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				
+				int index = filtersList.getSelectedIndex();
+				
+				if ((index < 0) || (filtersListModel.size() < 2) || (index < 1)) {
+					return;
+				}
+				
+				FilterListEntry entry = filtersListModel.remove(index);
+								
+				filtersListModel.insertElementAt(entry, index - 1);
+				filtersList.setSelectedIndex(index - 1);
+				populateProfileSummary();
+			}
+			
+		});
+		
+		moveDownButton.addActionListener(new AbstractAction () {
+
+			/*
+			 * Move the selected filter entry down the list
+			 */
+			@Override
+			public void actionPerformed (ActionEvent e) {
+			
+				
+				int index = filtersList.getSelectedIndex();
+				
+				if ((index < 0) || (filtersListModel.size() < 2) || (index > (filtersListModel.size() - 2))) {
+					return;
+				}
+				
+				FilterListEntry entry = filtersListModel.remove(index);
+				filtersListModel.insertElementAt(entry, index + 1);
+				filtersList.setSelectedIndex(index + 1);
+				populateProfileSummary();
+			}
+			
+		});
+		
+		addFolderButton.addActionListener(new AbstractAction () {
+			
+			/*
+			 * Displays a folder choosing dialog box and adds the selected folder
+			 * to the target folder list
+			 */
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				
+				FolderChooser folderChooser = new FolderChooser(
+						MainWindow.this, new File(System.getProperty("user.home")), "Select a target folder");
+				
+				if (folderChooser.getFolder() == true) {
+					foldersListModel.addElement(folderChooser.getSelectedFile().getPath());
+				}
+				
+				populateProfileSummary();				
+			}
+			
+		});
+		
+		removeFolderButton.addActionListener(new AbstractAction () {
 
 			@Override
 			public void actionPerformed (ActionEvent e) {
 
-				addProfile();
+				int index = foldersList.getSelectedIndex();
+				
+				if (index > -1) {
+					foldersListModel.removeElementAt(index);
+				}
+				
+				populateProfileSummary();
 			}
 			
 		});
 		
+//		ChangeListener selectionChangeListener = new ChangeListener() {
+//
+//			@Override
+//			public void stateChanged (ChangeEvent arg0) {
+//				populateProfileSummary();
+//			}
+//			
+//		};
+//		
+//		scanSubFoldersCheckBox.addChangeListener(selectionChangeListener);
+//		scanHiddenFoldersCheckBox.addChangeListener(selectionChangeListener);
+//		scanReadOnlyFoldersCheckBox.addChangeListener(selectionChangeListener);
+//		indexInclusivelyCheckBox.addChangeListener(selectionChangeListener);
+
+		
+		
+		/*
+		 * Defines the behavior of the menu bar items.
+		 */
+		guideMenuItem.addActionListener(new AbstractAction () {
+
+			@Override
+			public void actionPerformed (ActionEvent arg0) {
+				showUserGuide();
+			}
+			
+		});
+		
+		
+	}
+	
+	private void setDefaultValues () {
+		populateComboBoxProfiles();
+	}
+	
+	private Profile buildCurrentDetectionProfile () {
+		Profile selectedProfile;
+		Profile detectionProfile;
+		
+		/*
+		 * While the profile within the profile selector ComboBox could be used,
+		 * the user is able to change the options once the profile is loaded. So the
+		 * current options & settings need to be used.
+		 */
+		if (profileComboBox.getSelectedIndex() > -1) {
+			selectedProfile = ((ProfileEntry) profileComboBox.getSelectedItem()).getProfile();
+			detectionProfile = new Profile(selectedProfile.getName(), selectedProfile.getDescription());					
+		} else {
+			detectionProfile = new Profile("Custom Profile", "Custom Profile Decsription");
+		}
+		
+		//Set the indexing and scanning settings of the detection profile
+		detectionProfile.setSettings(new SettingsContainer(
+				indexInclusivelyCheckBox.isSelected(), scanSubFoldersCheckBox.isSelected(),
+				scanReadOnlyFoldersCheckBox.isSelected(), scanHiddenFoldersCheckBox.isSelected()));
+		
+		detectionProfile.setName(nameTextField.getText());
+		detectionProfile.setDescription(descriptionTextArea.getText());
+		
+		//Add the current entries within the filter list to the detection profile
+		for (int i = 0; i < filtersListModel.getSize(); i++) {
+			detectionProfile.getFilters().add(filtersListModel.get(i).getContentIndexFilter());
+		}
+		
+		//Add the current entries within the folder list to the detection profile
+		for (int i = 0; i < foldersListModel.getSize(); i++) {
+			detectionProfile.getTargets().add(foldersListModel.get(i));
+		}
+		
+		return detectionProfile;
 	}
 
-	
-	private void setMenuButtonColors (int selected) {
-		
-		((CardLayout)panelDeck.getLayout()).show(panelDeck, panelID[selected]);
-		
-		if (selected == 0) {
-			buttonHelp.setSelected(true);
-			buttonScan.setSelected(false);
-			buttonHistory.setSelected(false);
-			
-		} else if (selected == 1) {
-			buttonHelp.setSelected(false);
-			buttonScan.setSelected(true);
-			buttonHistory.setSelected(false);
-			populateComboBoxProfiles();			
-			
-		} else if (selected == 2) {
-			buttonHelp.setSelected(false);
-			buttonScan.setSelected(false);
-			buttonHistory.setSelected(true);
-			populateHistoryTable();
-		}
+	private void showUserGuide () {
+		UserGuidePanel userGuidePanel = new UserGuidePanel(reportTabbedPane);
+		reportTabbedPane.addTab("", null, userGuidePanel, "Welcome Page");
+		reportTabbedPane.setTabComponentAt(
+				reportTabbedPane.indexOfComponent(userGuidePanel), userGuidePanel.getTabAsComponent());
+		reportTabbedPane.setSelectedComponent(userGuidePanel);
 	}
 	
 	/*
@@ -463,13 +678,16 @@ public class MainWindow extends OxideFrame {
 		ContentIndex profileIndex = (new NameContainsFilter(".dfscan.profile.xml", true)).enforce(sourceIndex);
 		Profile profile;
 		
-		comboBoxProfile.setModel(new DefaultComboBoxModel<ProfileEntry>() );
+		profileComboBox.setModel(new DefaultComboBoxModel<ProfileEntry>() );
+		
+		((DefaultComboBoxModel<ProfileEntry>)profileComboBox.getModel()).addElement(
+				new ProfileEntry(new Profile("Select a profile or define your own...", "Does Something Wonderful")));
 		
 		for (HashableFile file : profileIndex) {
 
 			try {
 				profile = Profile.load(file.getPath());
-				((DefaultComboBoxModel<ProfileEntry>)comboBoxProfile.getModel()).addElement(new ProfileEntry(profile));	
+				((DefaultComboBoxModel<ProfileEntry>)profileComboBox.getModel()).addElement(new ProfileEntry(profile));	
 
 			} catch (SAXException e) {
 				e.printStackTrace();
@@ -487,30 +705,42 @@ public class MainWindow extends OxideFrame {
 		
 	}
 	
+	private void populateProfileSummary () {
+		summaryTextArea.setText("");
+		summaryTextArea.append(buildCurrentDetectionProfile().getDetailedDescription());
+		summaryTextArea.setCaretPosition(0);
+	}
+	
 	private void populateProfileDetails () {
 		
-		if (comboBoxProfile.getSelectedIndex() > -1) {
+		if (profileComboBox.getSelectedIndex() > -1) {
 			
-			textArea.setText("");
-			textArea.append(comboBoxProfile.getModel().getElementAt(
-					comboBoxProfile.getSelectedIndex()).getProfile().getDetailedDescription());
+			Profile profile = profileComboBox.getModel().getElementAt(profileComboBox.getSelectedIndex())
+					.getProfile();
+			
+			nameTextField.setText(profile.getName());
+			descriptionTextArea.setText(profile.getDescription());
+			scanSubFoldersCheckBox.setSelected(profile.getSettings().getIndexRecursively());
+			scanHiddenFoldersCheckBox.setSelected(profile.getSettings().getIndexHiddenFolders());
+			scanReadOnlyFoldersCheckBox.setSelected(profile.getSettings().getIndexReadOnlyFolders());
+			indexInclusivelyCheckBox.setSelected(profile.getSettings().getIndexInclusively());			
+			
+			foldersListModel = new DefaultListModel<String>();
+			foldersList.setModel(foldersListModel);
+			for (String targetPath : profile.getTargets()) {
+				foldersListModel.addElement(targetPath);
+			}
+			
+			filtersListModel = new DefaultListModel<FilterListEntry>();
+			filtersList.setModel(filtersListModel);
+			for (ContentIndexFilter filter : profile.getFilters()) {
+				filtersListModel.addElement(new FilterListEntry(filter));
+			}
+			
+			populateProfileSummary();
+			
 		}
 		
 	}
 	
-	private void editProfile () {
-		
-		
-		
-		if (comboBoxProfile.getSelectedIndex() > -1) {
-			ProfileEditorWindow editor = new ProfileEditorWindow(this, comboBoxProfile.getItemAt(comboBoxProfile.getSelectedIndex()).getProfile());
-						
-		}
-	}
-	
-	private void addProfile () {
-		
-		ProfileEditorWindow editor = new ProfileEditorWindow(this);
-		
-	}
 }

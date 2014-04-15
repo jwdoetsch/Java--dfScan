@@ -368,7 +368,7 @@ public class Profile {
 	 * @throws TransformerFactoryConfigurationError 
 	 * @throws TransformerException 
 	 */
-	public static void save (Profile profile, String path) throws TransformerFactoryConfigurationError, TransformerException {
+	public static void save (Profile profile, String fileName) throws TransformerFactoryConfigurationError, TransformerException {
 		
 		DocumentBuilderFactory docBuilderFactory;
 		DocumentBuilder docBuilder;
@@ -480,7 +480,7 @@ public class Profile {
 		
 		transformer.transform(new DOMSource(document),
 				new StreamResult(
-						new File("profiles/" + path)));
+						new File("profiles/" + fileName)));
 	}
 	
 	private static String fileNameTransformer (String sourceName) {

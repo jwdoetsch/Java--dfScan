@@ -52,6 +52,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.xml.sax.SAXException;
 
+import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.core.Profile;
 import com.doetsch.dfscan.core.SettingsContainer;
 import com.doetsch.dfscan.filter.ContentIndexFilter;
@@ -112,8 +113,8 @@ public class MainAppWindow2 extends JFrame {
 	private Component filteringOptionsTopGlue;
 	private Component filteringOptionsBottomGlue;
 	private JMenuItem openResultsMenuItem;
-	private JMenuItem mntmNewMenuItem;
-	private JSeparator separator;
+	private JMenuItem exitMenuItem;
+	private JSeparator fileMenuSeparator;
 	private JMenu helpMenu;
 	private JMenuItem aboutMenuItem;
 	private JMenuItem updateMenuItem;
@@ -123,10 +124,10 @@ public class MainAppWindow2 extends JFrame {
 	private JButton moveDownButton;
 	private Component verticalStrut;
 	private JButton refreshButton;
-	private Component saveStrut;
 	private JPanel headerPanel;
 	private JTextField nameTextField;
 	private JTextArea descriptionTextArea;
+	private JMenuItem wizardMenuItem;
 
 	/**
 	 * Launch the application.
@@ -161,7 +162,7 @@ public class MainAppWindow2 extends JFrame {
 	private void initComponents() {
 		setTitle("dfScan");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//setBounds(100, 100, 1026, 768);
+		setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
 		setSize(1026, 768);
 		setLocationRelativeTo(null);
 		
@@ -173,14 +174,17 @@ public class MainAppWindow2 extends JFrame {
 		fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
 		
+		wizardMenuItem = new JMenuItem("Wizard");
+		fileMenu.add(wizardMenuItem);
+		
 		openResultsMenuItem = new JMenuItem("Open Results...");
 		fileMenu.add(openResultsMenuItem);
 		
-		separator = new JSeparator();
-		fileMenu.add(separator);
+		fileMenuSeparator = new JSeparator();
+		fileMenu.add(fileMenuSeparator);
 		
-		mntmNewMenuItem = new JMenuItem("Exit");
-		fileMenu.add(mntmNewMenuItem);
+		exitMenuItem = new JMenuItem("Exit");
+		fileMenu.add(exitMenuItem);
 		
 		helpMenu = new JMenu("Help");
 		menuBar.add(helpMenu);
@@ -228,6 +232,9 @@ public class MainAppWindow2 extends JFrame {
 		
 		refreshButton = new JButton("Refresh");
 		profileSelectionBox.add(refreshButton);
+		
+		saveButton = new JButton("Save Current Settings & Options");
+		profileSelectionBox.add(saveButton);
 		
 		profileTabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		profilePanel.add(profileTabbedPane, BorderLayout.CENTER);
@@ -354,12 +361,6 @@ public class MainAppWindow2 extends JFrame {
 		startScanLeftGlue = Box.createHorizontalGlue();
 		startScanControlBox.add(startScanLeftGlue);
 		
-		saveButton = new JButton("Save Current Settings & Options");
-		startScanControlBox.add(saveButton);
-		
-		saveStrut = Box.createHorizontalStrut(90);
-		startScanControlBox.add(saveStrut);
-		
 		startScanButton = new JButton("Start Scan");
 		startScanControlBox.add(startScanButton);
 		
@@ -389,14 +390,14 @@ public class MainAppWindow2 extends JFrame {
 			
 		});
 		
-		saveButton.addActionListener(new AbstractAction() {
-
-			@Override
-			public void actionPerformed (ActionEvent arg0) {
-				populateProfileDetails();
-			}
-			
-		});
+//		saveButton.addActionListener(new AbstractAction() {
+//
+//			@Override
+//			public void actionPerformed (ActionEvent arg0) {
+//				populateProfileDetails();
+//			}
+//			
+//		});
 		
 		profileTabbedPane.addChangeListener(new ChangeListener() {
 
@@ -449,6 +450,7 @@ public class MainAppWindow2 extends JFrame {
 				String checkMessage = "Are you sure you'd like to save the current settings"
 						+ " and options under the profile name \"" + profile.getName() + "\"?"; 
 				String checkTitle = "Save Confirmation";
+				int currentProfileIndex = profileComboBox.getSelectedIndex();				
 				
 				if (JOptionPane.showConfirmDialog(MainAppWindow2.this, checkMessage,
 						checkTitle, JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
@@ -464,6 +466,7 @@ public class MainAppWindow2 extends JFrame {
 					}
 					
 					populateComboBoxProfiles();
+					profileComboBox.setSelectedIndex(currentProfileIndex);
 					
 				}
 			}

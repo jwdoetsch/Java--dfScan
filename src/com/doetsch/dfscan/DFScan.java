@@ -11,15 +11,19 @@ import javax.swing.plaf.metal.OceanTheme;
 
 import com.doetsch.dfscan.window.MainWindow;
 
+/**
+ * DFScan queues a MainWindow instance into the Swing event dispatch thread,
+ * effectively bootstrapping the application.
+ */
 public class DFScan {
 	
 	/**
-	 * Launch the application.
+	 * Creates a MainWindow instance and queues it in the Swing EDT.
 	 */
 	public static void main(String[] args) {
 	
 		try {
-			UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 			
 		} catch (ClassNotFoundException e1) {
 			e1.printStackTrace();
