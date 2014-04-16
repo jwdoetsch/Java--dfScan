@@ -853,7 +853,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 		publish(INDEX_GROUP_RESULTS_FINISHED);
 		
 		detectionTime = (int)((System.currentTimeMillis() - startTime) / 1000); 
-		Report resultsReport = Report.generate(indexGroups, start, new Date());
+		Report resultsReport = Report.generate(detectionProfile.getName(), indexGroups, start, new Date());
 		
 		Report.save(resultsReport);
 		
@@ -864,7 +864,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 		
 		int timeElapsed = (int)((System.currentTimeMillis() - startTime) / 1000);
 		
-		parentWindow.setTabTitle(detectionProfile.getName() + " (" + timeElapsed + " s) ");
+		parentWindow.setTabTitle("Scan: " + detectionProfile.getName() + " (" + timeElapsed + " s) ");
 		
 		for (String entry : entries) {
 			

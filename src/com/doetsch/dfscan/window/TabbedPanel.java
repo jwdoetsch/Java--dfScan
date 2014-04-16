@@ -127,7 +127,15 @@ public abstract class TabbedPanel extends JPanel {
 		};
 	}
 	
-	public abstract void tabButtonAction ();
+//	public abstract void tabButtonAction ();
+	
+	/**
+	 * Defines the default behavior of the tab's close button as
+	 * a call to closePanel(); 
+	 */
+	public void tabButtonAction () {
+		closePanel();
+	}
 	
 	public void setTabTitle (String title) {
 		this.tab.setTabTitle(title);

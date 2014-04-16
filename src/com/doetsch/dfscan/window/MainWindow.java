@@ -128,27 +128,28 @@ public class MainWindow extends JFrame {
 	private JTextField nameTextField;
 	private JTextArea descriptionTextArea;
 	private JMenuItem wizardMenuItem;
+	private JMenuItem donateMenuItem;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main (String[] args) {
-		try {
-			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		EventQueue.invokeLater(new Runnable() {
-			public void run () {
-				try {
-					MainWindow frame = new MainWindow();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	/**
+//	 * Launch the application.
+//	 */
+//	public static void main (String[] args) {
+//		try {
+//			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+//		} catch (Throwable e) {
+//			e.printStackTrace();
+//		}
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run () {
+//				try {
+//					MainWindow frame = new MainWindow();
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the frame.
@@ -162,7 +163,7 @@ public class MainWindow extends JFrame {
 	private void initComponents() {
 		setTitle("dfScan");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
+		setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan3.png"))).getImage());
 		setSize(1026, 768);
 		setLocationRelativeTo(null);
 		setVisible(true);
@@ -176,6 +177,7 @@ public class MainWindow extends JFrame {
 		menuBar.add(fileMenu);
 		
 		wizardMenuItem = new JMenuItem("Wizard");
+		wizardMenuItem.setEnabled(false);
 		fileMenu.add(wizardMenuItem);
 		
 		openResultsMenuItem = new JMenuItem("Open Results...");
@@ -193,11 +195,15 @@ public class MainWindow extends JFrame {
 		guideMenuItem = new JMenuItem("User Guide");
 		helpMenu.add(guideMenuItem);
 		
-		updateMenuItem = new JMenuItem("Check for Updates...");
+		updateMenuItem = new JMenuItem("Update");
 		helpMenu.add(updateMenuItem);
 		
 		helpMenuSeparator = new JSeparator();
 		helpMenu.add(helpMenuSeparator);
+		
+		donateMenuItem = new JMenuItem("Donate");
+		donateMenuItem.setToolTipText("A donation would go a long way to supporting us, and we'd love you forever!");
+		helpMenu.add(donateMenuItem);
 		
 		aboutMenuItem = new JMenuItem("About dfScan");
 		helpMenu.add(aboutMenuItem);
@@ -419,10 +425,10 @@ public class MainWindow extends JFrame {
 			public void actionPerformed (ActionEvent arg0) {
 				
 				ProgressPanel progressPanel = new ProgressPanel(buildCurrentDetectionProfile(), reportTabbedPane);
-				reportTabbedPane.addTab("", null, progressPanel, null);
-				reportTabbedPane.setTabComponentAt(
-						reportTabbedPane.indexOfComponent(progressPanel), progressPanel.getTabAsComponent());
-				reportTabbedPane.setSelectedComponent(progressPanel);
+//				reportTabbedPane.addTab("", null, progressPanel, null);
+//				reportTabbedPane.setTabComponentAt(
+//						reportTabbedPane.indexOfComponent(progressPanel), progressPanel.getTabAsComponent());
+//				reportTabbedPane.setSelectedComponent(progressPanel);
 				
 			}
 			
@@ -479,8 +485,8 @@ public class MainWindow extends JFrame {
 			@Override
 			public void actionPerformed (ActionEvent e) {
 				
-				FilterBuilderWindow filterBuilderWindow =
-						new FilterBuilderWindow(MainWindow.this, filtersListModel);
+				FilterBuilderDialog filterBuilderWindow =
+						new FilterBuilderDialog(MainWindow.this, filtersListModel);
 				//populateProfileSummary();
 				
 			}

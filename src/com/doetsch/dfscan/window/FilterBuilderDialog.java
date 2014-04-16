@@ -46,7 +46,7 @@ import javax.swing.Box;
 import java.awt.Window.Type;
 import java.awt.Dimension;
 
-public class FilterBuilderWindow extends JFrame {
+public class FilterBuilderDialog extends JFrame {
 
 	private JPanel contentPane;
 	private JComboBox<String> comboBoxFilterType;
@@ -71,7 +71,7 @@ public class FilterBuilderWindow extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public FilterBuilderWindow (Component parentFrame, DefaultListModel<FilterListEntry> listModel) {
+	public FilterBuilderDialog (Component parentFrame, DefaultListModel<FilterListEntry> listModel) {
 
 		this.parentFrame = parentFrame;		
 		this.listModelFilters = listModel;

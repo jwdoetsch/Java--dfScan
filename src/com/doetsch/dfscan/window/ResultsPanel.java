@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -60,6 +61,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.Box;
 
 public class ResultsPanel extends TabbedPanel {
@@ -209,31 +211,33 @@ public class ResultsPanel extends TabbedPanel {
 		
 	}
 	
-	private JPanel contentPane;
+	//private JPanel contentPane;
 	private JTable table;
 	private JScrollPane scrollPaneDuplicateFiles;
 	private Report resultsReport;
-	private JButton buttonMove;
-	private JComboBox<String> comboBoxSortBy;
-	private JLabel label_1;
-	private JLabel label_2;
-	private JComboBox comboBoxSelector;
-	private JButton buttonDelete;
-	private Box horizontalBox;
-	private Box verticalBox;
-	private Box verticalBox_1;
-	private Box horizontalBox_1;
-	private Component glue;
-
+	private JButton moveButton;
+	private JComboBox<String> sortingComboBox;
+	private JLabel scanDetailsLabel;
+	private JLabel scanResultsLabel;
+	private JComboBox<String> selectorComboBox;
+	private JButton deleteButton;
+	private Box handleControlBox;
+	private Box headerBox;
+	private Box controlBox;
+	private Component controlBoxGlue;
+	private JTabbedPane parentPane;
+	private Component leftGlue;
+	private Component rightGlue;
+	
 	/**
 	 * Create the frame.
 	 */
-	public ResultsPanel(Report resultsReport) {
+	public ResultsPanel(Report resultsReport, JTabbedPane parentPane) {
 
-		//super(false, new OxideDefaultSkin());
-		super("");
+		super("Results: " + resultsReport.getProfileName());
 		setBorder(new EmptyBorder(6, 6, 6, 6));
 		
+		this.parentPane = parentPane;
 		this.resultsReport = resultsReport;
 		
 		initComponents();
@@ -249,11 +253,16 @@ public class ResultsPanel extends TabbedPanel {
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 //		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
 
-		super.setTabTitle("Results " + resultsReport.getFinishDate()
-				+ " at " + resultsReport.getFinishTime());
+//		super.setTabTitle("Results " + resultsReport.getFinishDate()
+//				+ " at " + resultsReport.getFinishTime());
 		
-		setBounds(100, 100, 864, 552);
+		//setBounds(100, 100, 864, 552);
 		setLayout(new BorderLayout(0, 0));
+		
+		parentPane.addTab("", null, this, null);
+		parentPane.setTabComponentAt(
+				parentPane.indexOfComponent(this), this.getTabAsComponent());
+		parentPane.setSelectedComponent(this);
 		
 		
 		scrollPaneDuplicateFiles = new JScrollPane();
@@ -267,50 +276,53 @@ public class ResultsPanel extends TabbedPanel {
 			}
 		}
 		
-		verticalBox = Box.createVerticalBox();
-		add(verticalBox, BorderLayout.NORTH);
+		headerBox = Box.createVerticalBox();
+		add(headerBox, BorderLayout.NORTH);
 		
-		label_1 = new JLabel("");
-		verticalBox.add(label_1);
-				label_1.setText("Scan started by " + resultsReport.getUser()
+		scanDetailsLabel = new JLabel("");
+		headerBox.add(scanDetailsLabel);
+				scanDetailsLabel.setText("Scan started by " + resultsReport.getUser()
 				+ " on host " + resultsReport.getHost()
 				+ " at " + resultsReport.getStartTime()
 				+ " on " + resultsReport.getStartDate());
 		
-		label_2 = new JLabel("");
-		verticalBox.add(label_2);
-		label_2.setText("Found " + fileCount + " duplicate files in "
+		scanResultsLabel = new JLabel("");
+		headerBox.add(scanResultsLabel);
+		scanResultsLabel.setText("Found " + fileCount + " duplicate files in "
 				+ resultsReport.getGroups().size() + " common groups");
 		
-		horizontalBox_1 = Box.createHorizontalBox();
-		verticalBox.add(horizontalBox_1);
+		controlBox = Box.createHorizontalBox();
+		headerBox.add(controlBox);
 		
-		comboBoxSelector = new JComboBox<String>();
-		horizontalBox_1.add(comboBoxSelector);
-		comboBoxSelector.setModel(new DefaultComboBoxModel(new String[] {"Default Selection", "Select All Entries", "Select None"}));
-		comboBoxSelector.setBounds(12, 60, 258, 24);
+		selectorComboBox = new JComboBox<String>();
+		controlBox.add(selectorComboBox);
+		selectorComboBox.setModel(new DefaultComboBoxModel(new String[] {"Default Selection", "Select All Entries", "Select None"}));
+		selectorComboBox.setBounds(12, 60, 258, 24);
 		
-		glue = Box.createGlue();
-		horizontalBox_1.add(glue);
+		controlBoxGlue = Box.createGlue();
+		controlBox.add(controlBoxGlue);
 		
 
-		comboBoxSortBy = new JComboBox<String>();
-		horizontalBox_1.add(comboBoxSortBy);
-		comboBoxSortBy.setModel(new DefaultComboBoxModel<String>(new String[] {"Sort By...", "Size (Ascending)", "Size (Descending)", "Name (Ascending)", "Name (Descending)"}));
-		comboBoxSortBy.setBounds(282, 60, 570, 24);
+		sortingComboBox = new JComboBox<String>();
+		controlBox.add(sortingComboBox);
+		sortingComboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sort By...", "Size (Ascending)", "Size (Descending)", "Name (Ascending)", "Name (Descending)"}));
+		sortingComboBox.setBounds(282, 60, 570, 24);
 		
-		verticalBox_1 = Box.createVerticalBox();
-		add(verticalBox_1, BorderLayout.SOUTH);
+		handleControlBox = Box.createHorizontalBox();
+		add(handleControlBox, BorderLayout.SOUTH);
 		
-		horizontalBox = Box.createHorizontalBox();
-		verticalBox_1.add(horizontalBox);
+		leftGlue = Box.createHorizontalGlue();
+		handleControlBox.add(leftGlue);
 		
-		buttonDelete = new JButton("Delete Selected...");
-		horizontalBox.add(buttonDelete);
-		buttonDelete.setBounds(438, 492, 414, 24);
+		deleteButton = new JButton("Delete Selected...");
+		handleControlBox.add(deleteButton);
+		deleteButton.setBounds(438, 492, 414, 24);
 		
-		buttonMove = new JButton("Move Selected Files...");
-		horizontalBox.add(buttonMove);
+		moveButton = new JButton("Move Selected Files...");
+		handleControlBox.add(moveButton);
+		
+		rightGlue = Box.createHorizontalGlue();
+		handleControlBox.add(rightGlue);
 		
 		buildTable();
 	}
@@ -351,14 +363,14 @@ public class ResultsPanel extends TabbedPanel {
 	
 	private void setBehavior () {
 		
-		comboBoxSelector.addActionListener(new AbstractAction() {
+		selectorComboBox.addActionListener(new AbstractAction() {
 
 			@Override
 			public void actionPerformed (ActionEvent e) {
 
 				DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
 				
-				switch (comboBoxSelector.getSelectedIndex()) {
+				switch (selectorComboBox.getSelectedIndex()) {
 					case 0:
 						boolean groupID = true;
 						for (int row = 0; row < tableModel.getRowCount(); row++) {
@@ -389,7 +401,7 @@ public class ResultsPanel extends TabbedPanel {
 			
 		});
 		
-		buttonMove.addActionListener(new AbstractAction() {
+		moveButton.addActionListener(new AbstractAction() {
 
 			@Override
 			public void actionPerformed (ActionEvent e) {
@@ -427,7 +439,7 @@ public class ResultsPanel extends TabbedPanel {
 			
 		});
 		
-		buttonDelete.addActionListener(new AbstractAction() {
+		deleteButton.addActionListener(new AbstractAction() {
 
 			@Override
 			public void actionPerformed (ActionEvent e) {
@@ -487,13 +499,20 @@ public class ResultsPanel extends TabbedPanel {
 
 	@Override
 	public void tabButtonAction () {
-		// TODO Auto-generated method stub
-		
+		closePanel();
+	}
+
+	public void setTabTitle (String title) {
+		super.setTabTitle(title);
 	}
 
 	@Override
 	public void closePanel () {
-		// TODO Auto-generated method stub
+		int tabIndex = parentPane.indexOfComponent(this);
 		
+		if (tabIndex > -1) {
+			parentPane.remove(tabIndex);
+		}
 	}
+	
 }

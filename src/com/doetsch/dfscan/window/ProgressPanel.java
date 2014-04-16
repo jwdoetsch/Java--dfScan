@@ -59,7 +59,7 @@ public class ProgressPanel extends TabbedPanel {
 	 * Create the panel.
 	 */
 	public ProgressPanel (Profile detectionProfile, JTabbedPane parentPane) {
-		super(detectionProfile.getName());
+		super("Scan: " + detectionProfile.getName());
 		
 		this.detectionProfile = detectionProfile;
 		this.parentPane = parentPane;
@@ -72,6 +72,12 @@ public class ProgressPanel extends TabbedPanel {
 	
 	private void initComponents () {
 		setLayout(new BorderLayout(0, 0));
+		
+		parentPane.addTab("", null, this, null);
+		parentPane.setTabComponentAt(
+				parentPane.indexOfComponent(this), this.getTabAsComponent());
+		parentPane.setSelectedComponent(this);
+
 		
 		statusLabelBox = Box.createHorizontalBox();
 		add(statusLabelBox, BorderLayout.NORTH);
@@ -181,11 +187,11 @@ public class ProgressPanel extends TabbedPanel {
 						 */
 						if (!detectionTask.isCancelled()) {
 							try {
-								ResultsPanel resultsPanel = new ResultsPanel(detectionTask.get());
-								parentPane.addTab("", null, resultsPanel, null);
-								parentPane.setTabComponentAt(
-										parentPane.indexOfComponent(resultsPanel), resultsPanel.getTabAsComponent());
-								parentPane.setSelectedComponent(resultsPanel);
+								ResultsPanel resultsPanel = new ResultsPanel(detectionTask.get(), parentPane);
+//								parentPane.addTab("", null, resultsPanel, null);
+//								parentPane.setTabComponentAt(
+//										parentPane.indexOfComponent(resultsPanel), resultsPanel.getTabAsComponent());
+//								parentPane.setSelectedComponent(resultsPanel);
 								
 							} catch (InterruptedException | ExecutionException e1) {
 								System.out.println("Report not retrievable from the detection task!");
@@ -220,12 +226,6 @@ public class ProgressPanel extends TabbedPanel {
 		
 	}
 	
-	@Override
-	public void tabButtonAction () {
-		detectionTask.cancel(false);
-		closePanel();
-	}
-
 	/**
 	 * @return the indexingLabel
 	 */
@@ -324,7 +324,12 @@ public class ProgressPanel extends TabbedPanel {
 		this.parentPane = parentPane;
 	}
 
-
+	@Override
+	public void tabButtonAction () {
+		detectionTask.cancel(false);
+		closePanel();
+	}
+	
 	public void setTabTitle (String title) {
 		super.setTabTitle(title);
 	}
