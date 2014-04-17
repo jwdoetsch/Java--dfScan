@@ -58,7 +58,7 @@ public class UserGuidePanel extends TabbedPanel {
 	}
 
 	@Override
-	public void tabButtonAction () {
+	public void tabCloseButtonAction () {
 		closePanel();
 	}
 

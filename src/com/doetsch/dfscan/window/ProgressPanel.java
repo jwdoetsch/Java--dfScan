@@ -143,7 +143,7 @@ public class ProgressPanel extends TabbedPanel {
 			@Override
 			public void actionPerformed (ActionEvent arg0) {
 
-				tabButtonAction();
+				tabCloseButtonAction();
 			}
 			
 		});
@@ -213,7 +213,7 @@ public class ProgressPanel extends TabbedPanel {
 						
 						//disposePanel();
 						System.out.println("Task aborted/finished, removing panel...");
-						tabButtonAction();
+						tabCloseButtonAction();
 						
 					}
 					
@@ -325,7 +325,7 @@ public class ProgressPanel extends TabbedPanel {
 	}
 
 	@Override
-	public void tabButtonAction () {
+	public void tabCloseButtonAction () {
 		detectionTask.cancel(false);
 		closePanel();
 	}

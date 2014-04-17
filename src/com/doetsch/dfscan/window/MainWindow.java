@@ -130,27 +130,6 @@ public class MainWindow extends JFrame {
 	private JMenuItem wizardMenuItem;
 	private JMenuItem donateMenuItem;
 
-//	/**
-//	 * Launch the application.
-//	 */
-//	public static void main (String[] args) {
-//		try {
-//			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-//		} catch (Throwable e) {
-//			e.printStackTrace();
-//		}
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run () {
-//				try {
-//					MainWindow frame = new MainWindow();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
-
 	/**
 	 * Create the frame.
 	 */

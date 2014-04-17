@@ -121,7 +121,7 @@ public abstract class TabbedPanel extends JPanel {
 
 			@Override
 			public void actionPerformed (ActionEvent e) {
-				tabButtonAction();		
+				tabCloseButtonAction();		
 			}
 			
 		};
@@ -133,7 +133,7 @@ public abstract class TabbedPanel extends JPanel {
 	 * Defines the default behavior of the tab's close button as
 	 * a call to closePanel(); 
 	 */
-	public void tabButtonAction () {
+	public void tabCloseButtonAction () {
 		closePanel();
 	}
 	

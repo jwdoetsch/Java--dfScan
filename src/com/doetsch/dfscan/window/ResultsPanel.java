@@ -228,6 +228,8 @@ public class ResultsPanel extends TabbedPanel {
 	private JTabbedPane parentPane;
 	private Component leftGlue;
 	private Component rightGlue;
+	private JButton saveButton;
+	private Component glue;
 	
 	/**
 	 * Create the frame.
@@ -307,6 +309,12 @@ public class ResultsPanel extends TabbedPanel {
 		controlBox.add(sortingComboBox);
 		sortingComboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sort By...", "Size (Ascending)", "Size (Descending)", "Name (Ascending)", "Name (Descending)"}));
 		sortingComboBox.setBounds(282, 60, 570, 24);
+		
+		glue = Box.createGlue();
+		controlBox.add(glue);
+		
+		saveButton = new JButton("Save Report");
+		controlBox.add(saveButton);
 		
 		handleControlBox = Box.createHorizontalBox();
 		add(handleControlBox, BorderLayout.SOUTH);
@@ -498,7 +506,7 @@ public class ResultsPanel extends TabbedPanel {
 	}
 
 	@Override
-	public void tabButtonAction () {
+	public void tabCloseButtonAction () {
 		closePanel();
 	}
 
