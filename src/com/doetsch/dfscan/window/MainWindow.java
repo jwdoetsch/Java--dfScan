@@ -27,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
 import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
@@ -116,7 +117,6 @@ public class MainWindow extends JFrame {
 	private JMenuItem exitMenuItem;
 	private JSeparator fileMenuSeparator;
 	private JMenu helpMenu;
-	private JMenuItem aboutMenuItem;
 	private JMenuItem updateMenuItem;
 	private JSeparator helpMenuSeparator;
 	private JMenuItem guideMenuItem;
@@ -174,18 +174,15 @@ public class MainWindow extends JFrame {
 		guideMenuItem = new JMenuItem("User Guide");
 		helpMenu.add(guideMenuItem);
 		
-		updateMenuItem = new JMenuItem("Update");
-		helpMenu.add(updateMenuItem);
-		
-		helpMenuSeparator = new JSeparator();
-		helpMenu.add(helpMenuSeparator);
-		
 		donateMenuItem = new JMenuItem("Donate");
 		donateMenuItem.setToolTipText("A donation would go a long way to supporting us, and we'd love you forever!");
 		helpMenu.add(donateMenuItem);
 		
-		aboutMenuItem = new JMenuItem("About dfScan");
-		helpMenu.add(aboutMenuItem);
+		helpMenuSeparator = new JSeparator();
+		helpMenu.add(helpMenuSeparator);
+		
+		updateMenuItem = new JMenuItem("Update");
+		helpMenu.add(updateMenuItem);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(12, 0, 0, 0));
 		setContentPane(contentPane);
@@ -362,6 +359,19 @@ public class MainWindow extends JFrame {
 	}
 	
 	private void setBehavior () {
+		
+		/*
+		 * Behavior for selecting the Exit menu item; 
+		 */
+		exitMenuItem.addActionListener(new AbstractAction() {
+
+			@Override
+			public void actionPerformed (ActionEvent e) {
+				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(
+						new WindowEvent(MainWindow.this, WindowEvent.WINDOW_CLOSING));
+			}
+			
+		});
 		
 		/*
 		 * Define the behavior of the UI components within the profile pane
