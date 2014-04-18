@@ -414,11 +414,6 @@ public class MainWindow extends JFrame {
 			public void actionPerformed (ActionEvent arg0) {
 				
 				ProgressPanel progressPanel = new ProgressPanel(buildCurrentDetectionProfile(), reportTabbedPane);
-//				reportTabbedPane.addTab("", null, progressPanel, null);
-//				reportTabbedPane.setTabComponentAt(
-//						reportTabbedPane.indexOfComponent(progressPanel), progressPanel.getTabAsComponent());
-//				reportTabbedPane.setSelectedComponent(progressPanel);
-				
 			}
 			
 		});

@@ -3,6 +3,7 @@ package com.doetsch.dfscan.window;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.WindowEvent;
@@ -35,6 +36,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
@@ -46,41 +48,39 @@ import javax.swing.Box;
 import java.awt.Window.Type;
 import java.awt.Dimension;
 
-public class FilterBuilderDialog extends JFrame {
+public class FilterBuilderDialog extends JDialog {
 
 	private JPanel contentPane;
-	private JComboBox<String> comboBoxFilterType;
-	private JTextField textFieldFilterValue;
-	private JButton buttonAdd;
-	private JLabel labelFilterValue;
-	private JRadioButton radioButtonFilterInclusively;
-	private JRadioButton radioButtonFilterExclusively;
+	private JComboBox<String> ruleComboBox;
+	private JTextField valueTextField;
+	private JButton addButton;
+	private JLabel valueLabel;
+	private JRadioButton inclusiveRadioButton;
+	private JRadioButton exclusiveRadioButton;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private ContentIndexFilter newFilter;
-	private JButton buttonClose;
+	private JButton closeButton;
 	private DefaultListModel<FilterListEntry> listModelFilters;
 	private Component parentFrame;
 	private Box verticalBox;
-	private Box horizontalBox;
-	private Box horizontalBox_1;
-	private Box horizontalBox_2;
-	private Box horizontalBox_3;
-	private Component rigidArea;
-	private Component rigidArea_1;
+	private Box ruleBox;
+	private Box qualifyingValueBox;
+	private Box applyBox;
+	private Box dialogControlBox;
+	private Component dialogControlGlue;
+	private Component applyBoxGlue;
 	
 	/**
 	 * Create the frame.
 	 */
-	public FilterBuilderDialog (Component parentFrame, DefaultListModel<FilterListEntry> listModel) {
-
+	public FilterBuilderDialog (JFrame parentFrame, DefaultListModel<FilterListEntry> listModel) {
+		super(parentFrame);
 		this.parentFrame = parentFrame;		
 		this.listModelFilters = listModel;
 		newFilter = null;
 
 		initComponents();
 		setBehavior();
-		
-		parentFrame.setEnabled(false);
 	}
 
 	private void initComponents () {
@@ -90,99 +90,84 @@ public class FilterBuilderDialog extends JFrame {
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
-
-		//centerInViewport();
-
+		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan3.png"))).getImage());
 		setVisible(true);
 		
 		ButtonGroup radioButtonGroup = new ButtonGroup();
 		
 		verticalBox = Box.createVerticalBox();
 		verticalBox.setBorder(new EmptyBorder(6, 6, 6, 6));
-		getContentPane().add(verticalBox, BorderLayout.NORTH);
+		getContentPane().add(verticalBox, BorderLayout.CENTER);
 		
-		horizontalBox = Box.createHorizontalBox();
-		horizontalBox.setBorder(new EmptyBorder(0, 0, 6, 0));
-		verticalBox.add(horizontalBox);
+		ruleBox = Box.createHorizontalBox();
+		ruleBox.setBorder(new EmptyBorder(0, 0, 6, 0));
+		verticalBox.add(ruleBox);
 		
 		
-		comboBoxFilterType = new JComboBox<String>();
-		horizontalBox.add(comboBoxFilterType);
-		comboBoxFilterType.setModel(
+		ruleComboBox = new JComboBox<String>();
+		ruleBox.add(ruleComboBox);
+		ruleComboBox.setModel(
 				new DefaultComboBoxModel<String>(new String[] {
 						"File name contains ...", "File path contains ...",
 						"File size is less than or equal to ...",
 						"File size is greater than or equal to ...", 
 						"File is hidden", "File is read-only"}));
-		comboBoxFilterType.setBounds(12, 12, 456, 24);
+		ruleComboBox.setBounds(12, 12, 456, 24);
 		
-		horizontalBox_1 = Box.createHorizontalBox();
-		horizontalBox_1.setBorder(new EmptyBorder(0, 0, 6, 0));
-		verticalBox.add(horizontalBox_1);
+		qualifyingValueBox = Box.createHorizontalBox();
+		qualifyingValueBox.setBorder(new EmptyBorder(0, 0, 6, 0));
+		verticalBox.add(qualifyingValueBox);
 		
-		labelFilterValue = new JLabel("Qualifying Value: ");
-		horizontalBox_1.add(labelFilterValue);
-		labelFilterValue.setBounds(12, 48, 138, 24);
+		valueLabel = new JLabel("Qualifying Value: ");
+		qualifyingValueBox.add(valueLabel);
+		valueLabel.setBounds(12, 48, 138, 24);
 		
-		textFieldFilterValue = new JTextField();
-		horizontalBox_1.add(textFieldFilterValue);
-		textFieldFilterValue.setBounds(156, 48, 312, 24);
-		textFieldFilterValue.setColumns(10);
+		valueTextField = new JTextField();
+		qualifyingValueBox.add(valueTextField);
+		valueTextField.setBounds(156, 48, 312, 24);
+		valueTextField.setColumns(10);
 		
-		horizontalBox_2 = Box.createHorizontalBox();
-		horizontalBox_2.setBorder(new EmptyBorder(0, 0, 6, 0));
-		verticalBox.add(horizontalBox_2);
+		applyBox = Box.createHorizontalBox();
+		applyBox.setBorder(new EmptyBorder(0, 0, 6, 0));
+		verticalBox.add(applyBox);
 		
-		radioButtonFilterInclusively = new JRadioButton();
-		horizontalBox_2.add(radioButtonFilterInclusively);
-		radioButtonFilterInclusively.setText("Apply filter inclusively");
-		radioButtonFilterInclusively.setSelected(true);
-		buttonGroup.add(radioButtonFilterInclusively);
-		radioButtonFilterInclusively.setHorizontalAlignment(SwingConstants.CENTER);
-		radioButtonFilterInclusively.setBounds(12, 84, 228, 24);
-		radioButtonGroup.add(radioButtonFilterInclusively);
+		inclusiveRadioButton = new JRadioButton();
+		applyBox.add(inclusiveRadioButton);
+		inclusiveRadioButton.setText("Apply filter inclusively");
+		inclusiveRadioButton.setSelected(true);
+		buttonGroup.add(inclusiveRadioButton);
+		inclusiveRadioButton.setHorizontalAlignment(SwingConstants.CENTER);
+		inclusiveRadioButton.setBounds(12, 84, 228, 24);
+		radioButtonGroup.add(inclusiveRadioButton);
 		
-		rigidArea_1 = Box.createRigidArea(new Dimension(20, 20));
-		horizontalBox_2.add(rigidArea_1);
+		applyBoxGlue = Box.createRigidArea(new Dimension(20, 20));
+		applyBox.add(applyBoxGlue);
 		
-		radioButtonFilterExclusively = new JRadioButton();
-		horizontalBox_2.add(radioButtonFilterExclusively);
-		radioButtonFilterExclusively.setText("Apply filter exclusively");
-		buttonGroup.add(radioButtonFilterExclusively);
-		radioButtonFilterExclusively.setHorizontalAlignment(SwingConstants.CENTER);
-		radioButtonFilterExclusively.setBounds(240, 84, 228, 24);
-		radioButtonGroup.add(radioButtonFilterExclusively);
+		exclusiveRadioButton = new JRadioButton();
+		applyBox.add(exclusiveRadioButton);
+		exclusiveRadioButton.setText("Apply filter exclusively");
+		buttonGroup.add(exclusiveRadioButton);
+		exclusiveRadioButton.setHorizontalAlignment(SwingConstants.CENTER);
+		exclusiveRadioButton.setBounds(240, 84, 228, 24);
+		radioButtonGroup.add(exclusiveRadioButton);
 		
-		horizontalBox_3 = Box.createHorizontalBox();
-		verticalBox.add(horizontalBox_3);
+		dialogControlBox = Box.createHorizontalBox();
+		verticalBox.add(dialogControlBox);
 		
-		buttonAdd = new JButton("Add");
-		horizontalBox_3.add(buttonAdd);
-		buttonAdd.setBounds(12, 120, 222, 24);
+		addButton = new JButton("Add");
+		dialogControlBox.add(addButton);
+		addButton.setBounds(12, 120, 222, 24);
 		
-		rigidArea = Box.createRigidArea(new Dimension(20, 20));
-		horizontalBox_3.add(rigidArea);
+		dialogControlGlue = Box.createRigidArea(new Dimension(20, 20));
+		dialogControlBox.add(dialogControlGlue);
 		
-		buttonClose = new JButton("Close");
-		horizontalBox_3.add(buttonClose);
-		buttonClose.setBounds(246, 120, 222, 24);
+		closeButton = new JButton("Close");
+		dialogControlBox.add(closeButton);
+		closeButton.setBounds(246, 120, 222, 24);
 		
 	}
 	
 	private void setBehavior () {
-		
-//		setCloseButtonBehavior(new AbstractAction() {
-//
-//			@Override
-//			public void actionPerformed (ActionEvent e) {
-//
-//				parentFrame.setEnabled(true);
-//				dispose();
-//			}
-//			
-//		});
-//		
 		
 		this.addWindowListener(new WindowListener() {
 
@@ -200,7 +185,7 @@ public class FilterBuilderDialog extends JFrame {
 
 			@Override
 			public void windowClosing (WindowEvent arg0) {
-				closeAndUnlock();
+				closeDialog();
 			}
 
 			@Override
@@ -229,7 +214,7 @@ public class FilterBuilderDialog extends JFrame {
 			
 		});
 		
-		buttonAdd.addActionListener(new AbstractAction() {
+		addButton.addActionListener(new AbstractAction() {
 
 			@Override
 			public void actionPerformed (ActionEvent arg0) {
@@ -238,27 +223,26 @@ public class FilterBuilderDialog extends JFrame {
 			
 		});
 		
-		buttonClose.addActionListener(new AbstractAction() {
+		closeButton.addActionListener(new AbstractAction() {
 
 			@Override
 			public void actionPerformed (ActionEvent arg0) {
-				closeAndUnlock();
+				closeDialog();
 			}
 			
 		});
 		
 	}
 	
-	private void closeAndUnlock () {
-		parentFrame.setEnabled(true);
+	private void closeDialog () {
 		dispose();
 	}
 	
 	private void saveFilter () {
 		
-		int filterType = comboBoxFilterType.getSelectedIndex();
-		String filterValue = textFieldFilterValue.getText();		
-		boolean isInclusive = radioButtonFilterInclusively.isSelected();
+		int filterType = ruleComboBox.getSelectedIndex();
+		String filterValue = valueTextField.getText();		
+		boolean isInclusive = inclusiveRadioButton.isSelected();
 		long size = 0;
 		
 		if ((filterType < 4) && (filterValue.equals(""))) {
