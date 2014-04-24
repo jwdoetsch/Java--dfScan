@@ -287,6 +287,8 @@ public class DetectionTask extends SwingWorker<Report, String> {
 			
 			targetFolderContents = targetFolder.listFiles();
 			
+			publish("Indexing " + targetFolderPath);
+			
 			/*
 			 * If the target folder contents can't be enumerated then bail
 			 */
@@ -307,7 +309,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 				return index;
 			}
 			
-			publish("Indexing " + targetFolderPath);
+//			publish("Indexing " + targetFolderPath);
 			
 			/*
 			 * Iterate through the contents of the target folder, building the

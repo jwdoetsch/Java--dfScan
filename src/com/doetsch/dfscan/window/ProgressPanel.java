@@ -59,7 +59,7 @@ public class ProgressPanel extends TabbedPanel {
 	 * Create the panel.
 	 */
 	public ProgressPanel (Profile detectionProfile, JTabbedPane parentPane) {
-		super("Scan: " + detectionProfile.getName());
+		super("Scan: " + detectionProfile.getName(), new ImageIcon(DFScan.class.getResource("resources/icons/scan_icon.gif")));
 		
 		this.detectionProfile = detectionProfile;
 		this.parentPane = parentPane;
@@ -194,7 +194,7 @@ public class ProgressPanel extends TabbedPanel {
 //								parentPane.setSelectedComponent(resultsPanel);
 								
 							} catch (InterruptedException | ExecutionException e1) {
-								System.out.println("Report not retrievable from the detection task!");
+								//System.out.println("Report not retrievable from the detection task!");
 								e1.printStackTrace();
 							}
 							
@@ -212,7 +212,7 @@ public class ProgressPanel extends TabbedPanel {
 //						ProgressPanel.this.dispose();
 						
 						//disposePanel();
-						System.out.println("Task aborted/finished, removing panel...");
+						//System.out.println("Task aborted/finished, removing panel...");
 						tabCloseButtonAction();
 						
 					}

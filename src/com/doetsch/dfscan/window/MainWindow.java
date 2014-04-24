@@ -401,7 +401,6 @@ public class MainWindow extends JFrame {
 			public void stateChanged (ChangeEvent e) {
 
 				if (reportTabbedPane.getSelectedIndex() == 0) {
-					System.out.println("Summary tab selected");
 					populateProfileSummary();
 				}
 			}

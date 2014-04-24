@@ -9,11 +9,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 import com.doetsch.dfscan.DFScan;
@@ -70,24 +72,34 @@ public abstract class TabbedPanel extends JPanel {
 		String title;
 		JLabel tabTitleLabel;
 		TabLabelCloseButton closeButton;
+		ImageIcon tabIcon;
 		
 		
 		
-		public TabLabel (String title) {
+		public TabLabel (String title, ImageIcon tabIcon) {
 			super(new FlowLayout(FlowLayout.LEFT, 0, 0));
-
 			this.title = title;
+			this.tabIcon = tabIcon;
+			
 			init();
 		}
 		
 		private void init() {
+			this.setOpaque(false);
+			this.setBorder(new EmptyBorder(3, 0, 0, 0));
 			
 			tabTitleLabel = new JLabel();
+			tabTitleLabel.setOpaque(false);
 			setTabTitle(title);
-			tabTitleLabel.setOpaque(true);
+						
+			System.out.println(tabIcon);
+			if (tabIcon != null) {
+				this.add(new JLabel(" ", tabIcon, SwingConstants.TRAILING));
+			}
+			
 			this.add(tabTitleLabel);
 			this.add(new TabLabelCloseButton());
-			this.repaint();
+			//this.repaint();
 		}
 		
 		private String getTabTitle () {
@@ -104,14 +116,14 @@ public abstract class TabbedPanel extends JPanel {
 	
 	private TabLabel tab;
 	private AbstractAction buttonAction;
+	public ImageIcon tabIcon;
 //	private String title;
 //	private JLabel titleLabel;
 	
-	public TabbedPanel (String title) {
-		this.tab = new TabLabel(title);
-//		this.title = title;
+	public TabbedPanel (String title, ImageIcon tabIcon) {
+		this.tab = new TabLabel(title, tabIcon);
+		System.out.println(tabIcon);
 
-		
 		init();
 	}
 	

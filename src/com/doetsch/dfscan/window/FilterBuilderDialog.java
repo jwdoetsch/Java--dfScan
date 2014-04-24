@@ -2,16 +2,12 @@ package com.doetsch.dfscan.window;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.EventQueue;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 
@@ -26,10 +22,6 @@ import com.doetsch.dfscan.filter.PathContainsFilter;
 import com.doetsch.dfscan.filter.ReadOnlyFileFilter;
 import com.doetsch.dfscan.filter.SizeCeilingFilter;
 import com.doetsch.dfscan.filter.SizeFloorFilter;
-import com.doetsch.dfscan.window.*;
-import com.doetsch.oxide.OxideComponentFactory;
-import com.doetsch.oxide.OxideDefaultSkin;
-import com.doetsch.oxide.OxideFrame;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListModel;
@@ -42,15 +34,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 import javax.swing.ButtonGroup;
-import javax.swing.UIManager;
 import javax.swing.Box;
 
-import java.awt.Window.Type;
 import java.awt.Dimension;
 
 public class FilterBuilderDialog extends JDialog {
 
-	private JPanel contentPane;
 	private JComboBox<String> ruleComboBox;
 	private JTextField valueTextField;
 	private JButton addButton;
@@ -74,7 +63,7 @@ public class FilterBuilderDialog extends JDialog {
 	 * Create the frame.
 	 */
 	public FilterBuilderDialog (JFrame parentFrame, DefaultListModel<FilterListEntry> listModel) {
-		super(parentFrame);
+		super(parentFrame, "Add Filters", ModalityType.MODELESS);
 		this.parentFrame = parentFrame;		
 		this.listModelFilters = listModel;
 		newFilter = null;
@@ -84,7 +73,6 @@ public class FilterBuilderDialog extends JDialog {
 	}
 
 	private void initComponents () {
-		setTitle("Build filter...");
 		setBounds(100, 100, 498, 160);
 		setLocationRelativeTo(parentFrame);
 		setResizable(false);
@@ -164,54 +152,17 @@ public class FilterBuilderDialog extends JDialog {
 		closeButton = new JButton("Close");
 		dialogControlBox.add(closeButton);
 		closeButton.setBounds(246, 120, 222, 24);
-		
+		//this.setModalityType(ModalityType.APPLICATION_MODAL);
 	}
 	
 	private void setBehavior () {
 		
-		this.addWindowListener(new WindowListener() {
-
-			@Override
-			public void windowActivated (WindowEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void windowClosed (WindowEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
+		this.addWindowListener(new WindowAdapter() {
+			
 			@Override
 			public void windowClosing (WindowEvent arg0) {
 				closeDialog();
 			}
-
-			@Override
-			public void windowDeactivated (WindowEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void windowDeiconified (WindowEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void windowIconified (WindowEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void windowOpened (WindowEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
 		});
 		
 		addButton.addActionListener(new AbstractAction() {

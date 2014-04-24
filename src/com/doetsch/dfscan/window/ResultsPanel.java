@@ -1,68 +1,45 @@
 package com.doetsch.dfscan.window;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.EventQueue;
-import java.awt.Point;
-import java.awt.Toolkit;
 import java.util.ArrayList;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.UIManager;
-import javax.swing.border.TitledBorder;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-
-import com.doetsch.dfscan.DFScan;
-import com.doetsch.dfscan.core.Report;
-import com.doetsch.dfscan.util.ContentIndex;
-import com.doetsch.dfscan.util.FolderChooser;
-import com.doetsch.dfscan.util.HashableFile;
-import com.doetsch.oxide.OxideComponentFactory;
-import com.doetsch.oxide.OxideDefaultSkin;
-import com.doetsch.oxide.OxideFrame;
-
-import javax.swing.JTextPane;
-import javax.swing.JTextArea;
-import javax.swing.border.EtchedBorder;
-import javax.swing.JButton;
-
-import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 
-import javax.swing.JSeparator;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.AbstractAction;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
+import javax.swing.Box;
 import javax.swing.JComboBox;
+import javax.swing.JButton;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.border.BevelBorder;
-
-import java.awt.FlowLayout;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.Toolkit;
 
-import javax.swing.Box;
+import com.doetsch.dfscan.core.Report;
+import com.doetsch.dfscan.util.ContentIndex;
+import com.doetsch.dfscan.util.FolderChooser;
+import com.doetsch.dfscan.util.HashableFile;
+
+
+
+
 
 public class ResultsPanel extends TabbedPanel {
 
@@ -236,7 +213,7 @@ public class ResultsPanel extends TabbedPanel {
 	 */
 	public ResultsPanel(Report resultsReport, JTabbedPane parentPane) {
 
-		super("Results: " + resultsReport.getProfileName());
+		super("Results: " + resultsReport.getProfileName(), null);
 		setBorder(new EmptyBorder(6, 6, 6, 6));
 		
 		this.parentPane = parentPane;
@@ -248,17 +225,8 @@ public class ResultsPanel extends TabbedPanel {
 		
 	}
 
-	protected void initComponents() {
+	private void initComponents() {
 		
-//		setTitle("Results for scan completed on " + resultsReport.getFinishDate()
-//				+ " at " + resultsReport.getFinishTime());
-//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//		this.setIconImage((new ImageIcon(DFScan.class.getResource("resources/icons/dfscan2.png"))).getImage());
-
-//		super.setTabTitle("Results " + resultsReport.getFinishDate()
-//				+ " at " + resultsReport.getFinishTime());
-		
-		//setBounds(100, 100, 864, 552);
 		setLayout(new BorderLayout(0, 0));
 		
 		parentPane.addTab("", null, this, null);

@@ -30,7 +30,7 @@ public class UserGuidePanel extends TabbedPanel {
 	 * Create the panel.
 	 */
 	public UserGuidePanel (JTabbedPane parentPane) {
-		super("Welcome to dfScan!");
+		super("Welcome to dfScan!", null);
 		this.parentPane = parentPane;
 
 		initComponents();

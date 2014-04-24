@@ -25,17 +25,17 @@ public class DFScan {
 		try {
 			UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 			
-		} catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 			
-		} catch (InstantiationException e1) {
-			e1.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
 			
-		} catch (IllegalAccessException e1) {
-			e1.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
 			
-		} catch (UnsupportedLookAndFeelException e1) {
-			e1.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
 		}
 		
 		EventQueue.invokeLater(new Runnable() {
