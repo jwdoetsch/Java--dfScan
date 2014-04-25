@@ -14,6 +14,7 @@ import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
@@ -21,6 +22,7 @@ import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.DefaultComboBoxModel;
+
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -32,6 +34,7 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.Toolkit;
 
+import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.core.Report;
 import com.doetsch.dfscan.util.ContentIndex;
 import com.doetsch.dfscan.util.FolderChooser;
@@ -213,7 +216,8 @@ public class ResultsPanel extends TabbedPanel {
 	 */
 	public ResultsPanel(Report resultsReport, JTabbedPane parentPane) {
 
-		super("Results: " + resultsReport.getProfileName(), null);
+		super(resultsReport.getFinishDate() + " " + resultsReport.getFinishTime() + " " + resultsReport.getProfileName(),
+				new ImageIcon(DFScan.class.getResource("resources/icons/report_icon2.gif")));
 		setBorder(new EmptyBorder(6, 6, 6, 6));
 		
 		this.parentPane = parentPane;

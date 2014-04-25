@@ -59,7 +59,8 @@ public class ProgressPanel extends TabbedPanel {
 	 * Create the panel.
 	 */
 	public ProgressPanel (Profile detectionProfile, JTabbedPane parentPane) {
-		super("Scan: " + detectionProfile.getName(), new ImageIcon(DFScan.class.getResource("resources/icons/scan_icon.gif")));
+		super("" + detectionProfile.getName(),
+				new ImageIcon(DFScan.class.getResource("resources/icons/scan_icon.gif")));
 		
 		this.detectionProfile = detectionProfile;
 		this.parentPane = parentPane;

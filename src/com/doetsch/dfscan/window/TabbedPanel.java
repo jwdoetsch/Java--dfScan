@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -71,10 +72,7 @@ public abstract class TabbedPanel extends JPanel {
 		
 		String title;
 		JLabel tabTitleLabel;
-		TabLabelCloseButton closeButton;
 		ImageIcon tabIcon;
-		
-		
 		
 		public TabLabel (String title, ImageIcon tabIcon) {
 			super(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -86,20 +84,26 @@ public abstract class TabbedPanel extends JPanel {
 		
 		private void init() {
 			this.setOpaque(false);
-			this.setBorder(new EmptyBorder(3, 0, 0, 0));
+			this.setBorder(new EmptyBorder(6, 0, 0, 0));
 			
 			tabTitleLabel = new JLabel();
 			tabTitleLabel.setOpaque(false);
+			tabTitleLabel.setFont(new Font("Arial", Font.PLAIN, 13));
 			setTabTitle(title);
 						
-			System.out.println(tabIcon);
 			if (tabIcon != null) {
-				this.add(new JLabel(" ", tabIcon, SwingConstants.TRAILING));
+				JLabel iconLabel = new JLabel(tabIcon);
+				//Position the extra space to the right of the icon
+				iconLabel.setHorizontalAlignment(JLabel.LEADING);
+				iconLabel.setPreferredSize(new Dimension(24, 18));
+				this.add(iconLabel);
+				
 			}
 			
 			this.add(tabTitleLabel);
-			this.add(new TabLabelCloseButton());
-			//this.repaint();
+			
+			TabLabelCloseButton closeLabel = new TabLabelCloseButton();
+			this.add(closeLabel);
 		}
 		
 		private String getTabTitle () {
@@ -117,8 +121,6 @@ public abstract class TabbedPanel extends JPanel {
 	private TabLabel tab;
 	private AbstractAction buttonAction;
 	public ImageIcon tabIcon;
-//	private String title;
-//	private JLabel titleLabel;
 	
 	public TabbedPanel (String title, ImageIcon tabIcon) {
 		this.tab = new TabLabel(title, tabIcon);
