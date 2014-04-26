@@ -36,6 +36,7 @@ public abstract class TabbedPanel extends JPanel {
 				this.setPreferredSize(new Dimension(20, 20));
 				this.setIcon(new ImageIcon(DFScan.class.getResource("resources/icons/close_icon_18x18.png")));
 				this.setHorizontalAlignment(SwingConstants.CENTER);
+				this.setVerticalAlignment(SwingConstants.CENTER);
 				
 				this.addMouseListener(new MouseAdapter() {
 
@@ -124,7 +125,6 @@ public abstract class TabbedPanel extends JPanel {
 	
 	public TabbedPanel (String title, ImageIcon tabIcon) {
 		this.tab = new TabLabel(title, tabIcon);
-		System.out.println(tabIcon);
 
 		init();
 	}

@@ -6,6 +6,7 @@ import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
@@ -30,7 +31,8 @@ public class UserGuidePanel extends TabbedPanel {
 	 * Create the panel.
 	 */
 	public UserGuidePanel (JTabbedPane parentPane) {
-		super("Welcome to dfScan!", null);
+		super("Welcome to dfScan!",
+				new ImageIcon(DFScan.class.getResource("resources/icons/userguide_icon.png")));
 		this.parentPane = parentPane;
 
 		initComponents();
