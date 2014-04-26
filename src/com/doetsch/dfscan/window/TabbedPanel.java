@@ -33,8 +33,8 @@ public abstract class TabbedPanel extends JPanel {
 			}
 			
 			private void init () {
-				this.setPreferredSize(new Dimension(18, 18));
-				this.setIcon(new ImageIcon(DFScan.class.getResource("resources/icons/close_icon.png")));
+				this.setPreferredSize(new Dimension(20, 20));
+				this.setIcon(new ImageIcon(DFScan.class.getResource("resources/icons/close_icon_18x18.png")));
 				this.setHorizontalAlignment(SwingConstants.CENTER);
 				
 				this.addMouseListener(new MouseAdapter() {
