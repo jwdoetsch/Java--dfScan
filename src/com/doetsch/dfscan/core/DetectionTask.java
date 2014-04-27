@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2014 Jacob Wesley Doetsch
+ * 
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 package com.doetsch.dfscan.core;
 
 import java.io.BufferedInputStream;
@@ -5,15 +22,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.InetAddress;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -23,29 +34,11 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.ImageIcon;
 import javax.swing.SwingWorker;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Attr;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
 import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.filter.ContentIndexFilter;
 import com.doetsch.dfscan.util.ContentIndex;
 import com.doetsch.dfscan.util.HashableFile;
-import com.doetsch.dfscan.window.ProgressWindow;
+import com.doetsch.dfscan.window.ProgressPanel;
 
 /**
  * DetectionTask is a SwingWorker thread enveloping the detection and
@@ -58,23 +51,64 @@ import com.doetsch.dfscan.window.ProgressWindow;
  */
 public class DetectionTask extends SwingWorker<Report, String> {
 
+	/**
+	 * EqualityTester defines an interface by which to compare HashabileFile
+	 * instances to determine equality.
+	 */
 	private abstract class EqualityTester {
 		
+		/**
+		 * Implementations of this method are intended to test the equality
+		 * and equivalence between the given HashableFile instances.
+		 * 
+		 * @param a the first HashableFile instance
+		 * @param b the second HashableFile instance
+		 */
 		protected abstract boolean areEqual (HashableFile a, HashableFile b);
 		
 	}
 	
+	/**
+	 * Grouper provides a mechanism with which to compare and group collections of
+	 * HashabileFile instances. The collection is sorted according to the given
+	 * Comparator implementation. The equality and equivalence of the HashabileFile
+	 * instances encapsulated in the collection is determined by the implementation
+	 * of the given EqualityTester. In addition, upon instantiation, a minimum group
+	 * size floor limit is declared.
+	 */
 	private class Grouper {
 		private Comparator<HashableFile> comparator;
 		private EqualityTester equalityTester;
 		private int minimumGroupSize;
 		
+		/**
+		 * Creates as new Grouper instance.
+		 * 
+		 * @param comparator the Comparator by which to sort the source ContentIndex
+		 * when group(..) is called
+		 * @param equalityTester the EqualityTester by which to determine equivalence
+		 * when group(..) is called
+		 * @param minimumGroupSize the minimum size of a group, groups with sizes less
+		 * than this limit will be excluded from the results passed by group(..)
+		 */
 		private Grouper (Comparator<HashableFile> comparator, EqualityTester equalityTester, int minimumGroupSize) {
 			this.comparator = comparator;
 			this.equalityTester = equalityTester;
 			this.minimumGroupSize = minimumGroupSize;
 		}
 		
+		/**
+		 * Sorts the contents of the given ContentIndex according to the Comparator
+		 * supplied on construction, determines contents' equivalence according to the
+		 * EqualityTester implementation supplied upon construction, groups equivalent
+		 * contents into separate ContentIndex instances (excluding groups with less than
+		 * the supplied limit of members), and finally returns an ArrayList collection of
+		 * the ContentIndex instances representing the separate groups.
+		 * 
+		 * @param sourceIndex the ContentIndex encapsulating the HashabileFile collection
+		 * that is to be sorted and grouped
+		 * @return the ArrayList collection of the groups of common contents
+		 */
 		private ArrayList<ContentIndex> group (ContentIndex sourceIndex) {
 
 			//ContentIndex culledIndex = new ContentIndex();
@@ -165,23 +199,38 @@ public class DetectionTask extends SwingWorker<Report, String> {
 			
 	}
 	
+	/**
+	 * SubWorker defines an abstract interface extension of a SwingWorker
+	 * that encapsulates a single ContentIndex provided upon construction
+	 * under the assumption that classes implementing SubWorker will be doing
+	 * a task with regards to that source ContentIndex.
+	 * 
+	 * In addition, SubWorker defines the behavior of the SwingWorker extension,
+	 * returning a ContentIndex upon completion of it's background task thread
+	 * and defining the behavior of publish(..) calls such that
+	 * String instances are to be passed.
+	 */
 	private abstract class SubWorker extends SwingWorker <ContentIndex, String> {
 		
 		private ContentIndex sourceIndex;
 		
+		/**
+		 * Creates a SubWorker instance defining 
+		 * @param sourceIndex
+		 */
 		private SubWorker (ContentIndex sourceIndex) {
 			this.sourceIndex = sourceIndex;
 		}
 		
-		public ContentIndex getSourceIndex () {
+		private ContentIndex getSourceIndex () {
 			return this.sourceIndex;
 		}
 
-		public void setSourceIndex (ContentIndex sourceIndex) {
+		private void setSourceIndex (ContentIndex sourceIndex) {
 			this.sourceIndex = sourceIndex;
 		}
 
-		/*
+		/**
 		 * Catches publish()'ed log entries and handles them according
 		 * to defined log behavior.
 		 * @see javax.swing.SwingWorker#process(java.util.List)
@@ -194,7 +243,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 		
 	}
 	
-	/*
+	/**
 	 * IndexBuilder is a SwingWorker thread responsible for generating a ContentIndex
 	 * representation of the contents of the target folders specified by the given
 	 * Profile. It indexes according to the options, settings, and rules also defined
@@ -202,11 +251,15 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	 */
 	private class IndexBuilder extends SubWorker {
 
+		/**
+		 * Creates an IndexBuilder instance that will do some work with regards to the
+		 * contents of the given source ContentIndex.
+		 */
 		private IndexBuilder (ContentIndex sourceIndex) {
 			super(sourceIndex);
 		}
 		
-		/*
+		/**
 		 * Generates a ContentIndex representation of the target folders specified
 		 * by the given Profile.
 		 * @see javax.swing.SwingWorker#doInBackground()
@@ -237,7 +290,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 			return primaryIndex;
 		}
 		
-		/*
+		/**
 		 * A class-private helper method that generates a ContentIndex representation
 		 * of the folder at the given path.
 		 * 
@@ -250,6 +303,8 @@ public class DetectionTask extends SwingWorker<Report, String> {
 			File[] targetFolderContents = null;
 			
 			targetFolderContents = targetFolder.listFiles();
+			
+			publish("Indexing " + targetFolderPath);
 			
 			/*
 			 * If the target folder contents can't be enumerated then bail
@@ -271,7 +326,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 				return index;
 			}
 			
-			publish("Indexing " + targetFolderPath);
+//			publish("Indexing " + targetFolderPath);
 			
 			/*
 			 * Iterate through the contents of the target folder, building the
@@ -337,7 +392,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	}
 	
 	
-	/*
+	/**
 	 * IndexFilterer is a SubWorker task responsible for applying the filters
 	 * defined by the given Profile. When executed, IndexFilterer will return
 	 * a new ContentIndex instance containing the contents of the supplied
@@ -347,8 +402,8 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	 */
 	private class IndexFilterer extends SubWorker {
 
-		/*
-		 * Create an IndexFitlerer instance.
+		/**
+		 * Create an IndexFilterer instance.
 		 * 
 		 * @param sourceIndex the ContentIndex to filter
 		 */
@@ -356,7 +411,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 			super(sourceIndex);
 		}
 		
-		/*
+		/**
 		 * Returns a ContentIndex representation of the contents of the 
 		 * source index that qualify and pass filtering.
 		 * 
@@ -416,7 +471,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	}
 	
 	
-	/*
+	/**
 	 * IndexCullerBySize is a SubWorker responsible for extracting the contents of
 	 * the supplied ContentIndex sourceIndex that represent a file-system file that
 	 * doesn't contain a common file size. IndexCullerBySize returns a ContentIndex
@@ -430,7 +485,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	 */
 	private class IndexCullerBySize extends SubWorker {
 
-		/*
+		/**
 		 * Creates an IndexCullerbySize index.
 		 * 
 		 * @param sourceIndex the ContentIndex to be culled
@@ -439,7 +494,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 			super (sourceIndex);
 		}
 		
-		/*
+		/**
 		 * Returns a ContentIndex representation of files contained with the
 		 * source index that have a file size in common with at least one other
 		 * file in the source index.
@@ -488,7 +543,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	}
 	
 	
-	/*
+	/**
 	 * IndexHasher is a SubWorker responsible for generating and adding hashes
 	 * to the contents of the given ContentIndex sourceIndex.
 	 * 
@@ -496,7 +551,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	 */
 	private class IndexHasher extends SubWorker {
 
-		/*
+		/**
 		 * Create an IndexHasher instance.
 		 * 
 		 * @param sourceIndex the ContentIndex to generate hashes for
@@ -579,7 +634,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 			
 		}
 		
-		/*
+		/**
 		 * Hashes and returns a ContentIndex representation of the encapsulated
 		 * HashableFile contents of the source index.
 		 * @see javax.swing.SwingWorker#doInBackground()
@@ -609,7 +664,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	}
 	
 	
-	/*
+	/**
 	 * IndexCullerByHash is a SubWorker responsible for extracting the contents
 	 * of the given ContentIndex source index that don't have a hash in common
 	 * with any other file in the ContentIndex.
@@ -618,7 +673,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	 */
 	private class IndexCullerByHash extends SubWorker {
 
-		/*
+		/**
 		 * Creates an IndexCullerbyHash instance.
 		 * 
 		 * @param sourceIndex the ContentIndex to cull
@@ -628,7 +683,7 @@ public class DetectionTask extends SwingWorker<Report, String> {
 		}
 		
 		
-		/*
+		/**
 		 * Returns a ContentIndex representation of files contained with the
 		 * source index that have a hash value in common with at least one other
 		 * file in the source index.
@@ -676,9 +731,8 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	
 	
 	private Profile detectionProfile;
-	private ProgressWindow parentWindow;
+	private ProgressPanel parentWindow;
 	
-	//Result
 	private ContentIndex sourceIndex;
 	private ContentIndex filteredIndex;
 	private ContentIndex culledBySizeIndex;
@@ -705,8 +759,8 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	//Indexing status icons
 	private final ImageIcon PROGRESS_ICON =
 			new ImageIcon(DFScan.class.getResource("resources/icons/progress_icon.gif"));
-//	private final ImageIcon YIELD_ICON = 
-//			new ImageIcon(ClassLoader.getSystemClassLoader().getResource("icons\\yield_icon.png"));
+	private final ImageIcon YIELD_ICON = 
+			new ImageIcon(DFScan.class.getResource("resources/icons/yield_icon.png"));
 	private final ImageIcon SUCCESS_ICON = 
 			new ImageIcon(DFScan.class.getResource("resources/icons/success_icon.png"));
 	
@@ -715,12 +769,12 @@ public class DetectionTask extends SwingWorker<Report, String> {
 	 * 
 	 * @param detectionProfile the Profile defining the targets, settings, and options
 	 * that will guide the detection process
-	 * @param parentWindow the AppWindow UI component that is considered the DetectionTask's
+	 * @param progressPanel the AppWindow UI component that is considered the DetectionTask's
 	 * parent, pop-up windows will be spawned with regard to the parentWindow.
 	 */
-	public DetectionTask (Profile detectionProfile, ProgressWindow parentWindow) {
+	public DetectionTask (Profile detectionProfile, ProgressPanel progressPanel) {
 		this.detectionProfile = detectionProfile;
-		this.parentWindow = parentWindow;
+		this.parentWindow = progressPanel;
 	}
 
 	/**
@@ -853,82 +907,73 @@ public class DetectionTask extends SwingWorker<Report, String> {
 		publish(INDEX_GROUP_RESULTS_FINISHED);
 		
 		detectionTime = (int)((System.currentTimeMillis() - startTime) / 1000); 
-		Report resultsReport = Report.generate(indexGroups, start, new Date());
+		Report resultsReport = Report.generate(detectionProfile.getName(), indexGroups, start, new Date());
 		
 		Report.save(resultsReport);
 		
 		return resultsReport;
 	}
 
+	/**
+	 * Handles the progress message flags and updates the parent ProgressPanel's
+	 * status indicators.
+	 */
 	protected void process (List<String> entries) {
 		
-		parentWindow.getLabelTimeElapsed().setText("Time Elapsed: "
-				+ (int)((System.currentTimeMillis() - startTime) / 1000) + " seconds");
+		int timeElapsed = (int)((System.currentTimeMillis() - startTime) / 1000);
+		
+		parentWindow.setTabTitle("Scan: " + detectionProfile.getName() + " (" + timeElapsed + " s) ");
 		
 		for (String entry : entries) {
-			
 
 			/*
 			 * If the DetectionTask has been cancelled then bail.
 			 */
-
 			if (DetectionTask.this.isCancelled()) {
 				return;
 			}
 			
-			parentWindow.getTextAreaLog().append(entry + "\n");
+			parentWindow.getLogTextPane().append(entry + "\n");
 			
 			if (entry == INDEX_BUILDER_STARTED) {
-					parentWindow.getLabelIndexingStatus().setIcon(PROGRESS_ICON);
-					parentWindow.getLabelIndexingStatus().setEnabled(true);
-					
+					parentWindow.getIndexingLabel().setIcon(PROGRESS_ICON);
+					parentWindow.getFilteringLabel().setIcon(YIELD_ICON);
+					parentWindow.getHashingLabel().setIcon(YIELD_ICON);
+					parentWindow.getGroupingLabel().setIcon(YIELD_ICON);
+					parentWindow.getIndexingLabel().setEnabled(true);
 					
 			} else if (entry == INDEX_BUILDER_FINISHED) {
-					//System.out.println("Indexed " + sourceIndex.getSize() + " files.");
-//					parentWindow.getLabelIndexingResults().setText(
-//							"Indexed " + sourceIndex.getSize() + " files.");
-					parentWindow.getLabelIndexingStatus().setIcon(SUCCESS_ICON); 
+					parentWindow.getIndexingLabel().setIcon(SUCCESS_ICON); 
 					
 			} else if (entry == INDEX_FILTERER_STARTED) {
-					parentWindow.getLabelFilteringStatus().setIcon(PROGRESS_ICON);
-					parentWindow.getLabelFilteringStatus().setEnabled(true);
+					parentWindow.getFilteringLabel().setIcon(PROGRESS_ICON);
+					parentWindow.getFilteringLabel().setEnabled(true);
 					
 			} else if (entry == INDEX_FILTERER_FINISHED) {
-					//System.out.println("Filtered index contains " + filteredIndex.getSize() + " files.");
 				
 			} else if (entry == INDEX_CULLERBYSIZE_STARTED) {
 				
 			} else if (entry == INDEX_CULLERBYSIZE_FINISHED) {
-					//System.out.println("Culled (by size) index contains " + culledBySizeIndex.getSize() + " files.");
-					//parentWindow.getLabelFilteringResults().setText(culledBySizeIndex.getSize() + " suspects");
-					parentWindow.getLabelFilteringStatus().setIcon(SUCCESS_ICON);
+					parentWindow.getFilteringLabel().setIcon(SUCCESS_ICON);
 					
 			} else if (entry == INDEX_HASHER_STARTED) {
-					parentWindow.getLabelHashingStatus().setIcon(PROGRESS_ICON);
-					parentWindow.getLabelHashingStatus().setEnabled(true);
+					parentWindow.getHashingLabel().setIcon(PROGRESS_ICON);
+					parentWindow.getHashingLabel().setEnabled(true);
 					
 			} else if (entry == INDEX_HASHER_FINISHED) {
-//					parentWindow.getLabelHashingResults().setText("OK");
-					parentWindow.getLabelHashingStatus().setIcon(SUCCESS_ICON);
+					parentWindow.getHashingLabel().setIcon(SUCCESS_ICON);
 					
 			} else if (entry == INDEX_CULLERBYHASH_STARTED) {
-					parentWindow.getLabelGroupingStatus().setIcon(PROGRESS_ICON);
-					parentWindow.getLabelGroupingStatus().setEnabled(true);
+					parentWindow.getGroupingLabel().setIcon(PROGRESS_ICON);
+					parentWindow.getGroupingLabel().setEnabled(true);
 					
 			} else if (entry == INDEX_CULLERBYHASH_FINISHED) {
-					//publish("Culled (by hash) index contains " + culledByHashIndex.getSize() + " files");
 					
 			} else if (entry == INDEX_GROUP_RESULTS_STARTED) {
 				
 			} else if (entry == INDEX_GROUP_RESULTS_FINISHED) {
-					parentWindow.getLabelGroupingStatus().setIcon(SUCCESS_ICON);
-//					parentWindow.getLabelGroupingResults().setText(culledByHashIndex.getSize() + " dupes in "
-//					+ indexGroups.size() + " groups");
+					parentWindow.getGroupingLabel().setIcon(SUCCESS_ICON);
 			}
-//			} else {
-//				parentWindow.getTextAreaLog().append(entry + "\n");
-//			}
-			
 		}
 	}
 	

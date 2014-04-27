@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2014 Jacob Wesley Doetsch
+ * 
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 package com.doetsch.dfscan.core;
 
 import java.io.File;
@@ -43,6 +60,7 @@ import com.doetsch.dfscan.util.HashableFile;
  */
 public class Report {
 	
+	private String profileName;
 	private String startDate;
 	private String startTime;
 	private String finishDate;
@@ -61,8 +79,8 @@ public class Report {
 	 * @param detectionTime 
 	 * @return the new Report instance
 	 */
-	public static Report generate (ArrayList<ContentIndex> dupeGroups, Date start, Date finish) {
-		return new Report(dupeGroups, start, finish);
+	public static Report generate (String detectionProfileName, ArrayList<ContentIndex> dupeGroups, Date start, Date finish) {
+		return new Report(detectionProfileName, dupeGroups, start, finish);
 	}
 	
 	/*
@@ -71,7 +89,7 @@ public class Report {
 	 * 
 	 * @param dupeGroups the groups of duplicate files
 	 */
-	private Report (ArrayList<ContentIndex> dupeGroups, Date start, Date finish) {
+	private Report (String detectionProfileName, ArrayList<ContentIndex> dupeGroups, Date start, Date finish) {
 		
 		try {
 			this.detectionTime  = (int)((finish.getTime() - start.getTime()) / 1000);
@@ -112,6 +130,8 @@ public class Report {
 		this.fileName = "dfScan Report "
 				+ (new SimpleDateFormat("MM-dd-yyyy HH_mm_ss")).format(new Date())
 				+ ".dfscan.report.xml";
+		
+		this.profileName = detectionProfileName;
 				
 	}
 
@@ -206,6 +226,24 @@ public class Report {
 	 */
 	public void setHost (String host) {
 		this.host = host;
+	}
+	
+	/**
+	 * Returns the name of the detection profile used to generate the report
+	 * 
+	 * @return a String representation of the detection profile's name
+	 */
+	public String getProfileName () {
+		return profileName;
+	}
+	
+	/**
+	 * Setes the name of the detection profile used to generate the report
+	 * 
+	 * @param name the name of the detection profile
+	 */
+	public void setProfileName (String name) {
+		this.profileName = name;
 	}
 
 	/**
@@ -340,6 +378,9 @@ public class Report {
 
 		//Add the name of the local host to the root element
 		rootElement.setAttribute("host", report.getHost());
+		
+		//Add the detection profile used to generate the results
+		rootElement.setAttribute("profile", report.getProfileName());
 
 		
 		//Add the name of the user who generated the report
@@ -415,6 +456,7 @@ public class Report {
 
 	public static Report load (File reportPath) {
 
+		String profileName;
 		String detectionTime;
 		String startDate;
 		String startTime;
@@ -456,7 +498,7 @@ public class Report {
 		host = rootAttributeNodes.getNamedItem("host").getNodeValue();
 		user = rootAttributeNodes.getNamedItem("user").getNodeValue();
 		detectionTime = rootAttributeNodes.getNamedItem("elapsed-time").getNodeValue();
-		
+		profileName = rootAttributeNodes.getNamedItem("profile").getNodeValue();
 		
 		/*
 		 * Retrieve the groups element <groups>, iterating through it's child elements
@@ -538,7 +580,7 @@ public class Report {
 		/*
 		 * Build the report
 		 */
-		Report report = Report.generate(groups, null, null);
+		Report report = Report.generate(profileName, groups, null, null);
 		report.setStartDate(startDate);
 		report.setStartTime(startTime);
 		report.setFinishDate(finishDate);
@@ -547,6 +589,7 @@ public class Report {
 		report.setHost(host);
 		report.setFileName(reportPath.getName());
 		report.setDetectionTime(Integer.valueOf(detectionTime));
+		//report.setProfileName(profileName);
 
 		return report;
 

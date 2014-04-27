@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2014 Jacob Wesley Doetsch
+ * 
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 package com.doetsch.dfscan.core;
 
 import java.io.File;
@@ -349,13 +366,26 @@ public class Profile {
 
 
 	/**
-	 * Formats and saves an XML representation of the given Profile.
+	 * Formats and saves an XML representation of the given profile at a path
+	 * defined by the profile's name.
+	 * 
+	 * @param profile
+	 * @throws TransformerFactoryConfigurationError
+	 * @throws TransformerException
+	 */
+	public static void save (Profile profile) throws TransformerFactoryConfigurationError, TransformerException {
+		save(profile, fileNameTransformer(profile.getName()) + ".dfscan.profile.xml");
+	}
+	
+	/**
+	 * Formats and saves an XML representation of the given Profile at the
+	 * given path.
 	 * 
 	 * @param profile the Profile to save
 	 * @throws TransformerFactoryConfigurationError 
 	 * @throws TransformerException 
 	 */
-	public static void save (Profile profile) throws TransformerFactoryConfigurationError, TransformerException {
+	public static void save (Profile profile, String fileName) throws TransformerFactoryConfigurationError, TransformerException {
 		
 		DocumentBuilderFactory docBuilderFactory;
 		DocumentBuilder docBuilder;
@@ -460,8 +490,6 @@ public class Profile {
 		transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
 
-		String fileName = fileNameTransformer(profile.getName());
-		
 		File resultsFolder = new File("profiles");
 		if (!resultsFolder.exists()) {
 			resultsFolder.mkdir();				
@@ -469,7 +497,7 @@ public class Profile {
 		
 		transformer.transform(new DOMSource(document),
 				new StreamResult(
-						new File("profiles/" + fileName + ".dfscan.profile.xml")));
+						new File("profiles/" + fileName)));
 	}
 	
 	private static String fileNameTransformer (String sourceName) {
