@@ -23,6 +23,8 @@ import java.awt.Color;
 import java.awt.Event;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
@@ -380,6 +382,20 @@ public class MainWindow extends JFrame {
 		
 			systemTrayIcon = new TrayIcon((new ImageIcon(DFScan.class.getResource("resources/icons/tray_icon.png"))).getImage());
 			
+			PopupMenu trayMenu = new PopupMenu();
+			MenuItem exitMenuItem = new MenuItem("Exit");
+			exitMenuItem.addActionListener(new AbstractAction() {
+
+				@Override
+				public void actionPerformed (ActionEvent arg0) {
+					closeApplication();
+				}
+				
+			});
+			
+			trayMenu.add(exitMenuItem);
+			systemTrayIcon.setPopupMenu(trayMenu);
+			
 			try {
 				SystemTray.getSystemTray().add(systemTrayIcon);
 	
@@ -399,8 +415,7 @@ public class MainWindow extends JFrame {
 
 			@Override
 			public void actionPerformed (ActionEvent e) {
-				Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(
-						new WindowEvent(MainWindow.this, WindowEvent.WINDOW_CLOSING));
+				closeApplication();
 			}
 			
 		});
@@ -643,6 +658,13 @@ public class MainWindow extends JFrame {
 	
 	private void setDefaultValues () {
 		populateComboBoxProfiles();
+	}
+	
+	/**
+	 * 
+	 */
+	private void closeApplication () {
+		this.processWindowEvent(new WindowEvent(MainWindow.this, WindowEvent.WINDOW_CLOSING));		
 	}
 	
 	private Profile buildCurrentDetectionProfile () {
