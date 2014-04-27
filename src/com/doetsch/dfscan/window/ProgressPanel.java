@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2014 Jacob Wesley Doetsch
+ * 
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 package com.doetsch.dfscan.window;
 
 import javax.swing.JPanel;
@@ -26,6 +43,8 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.concurrent.ExecutionException;
+import javax.swing.border.EmptyBorder;
+import java.awt.event.ActionListener;
 
 /**
  * 
@@ -47,13 +66,12 @@ public class ProgressPanel extends TabbedPanel {
 	private Component rightGlue;
 	private Component groupingStrut;
 	private JButton abortButton;
-	private JLabel timeElapsedLabel;
 	
 	private Profile detectionProfile;
 	private DetectionTask detectionTask;
-	private Component timeElapsedStrut;
 	private JTabbedPane parentPane;
 	private Component leftGlue;
+	private JButton logButton;
 
 	/**
 	 * Create the panel.
@@ -61,6 +79,7 @@ public class ProgressPanel extends TabbedPanel {
 	public ProgressPanel (Profile detectionProfile, JTabbedPane parentPane) {
 		super("" + detectionProfile.getName(),
 				new ImageIcon(DFScan.class.getResource("resources/icons/scan_icon.gif")));
+		setBorder(new EmptyBorder(6, 6, 6, 6));
 		
 		this.detectionProfile = detectionProfile;
 		this.parentPane = parentPane;
@@ -81,17 +100,11 @@ public class ProgressPanel extends TabbedPanel {
 
 		
 		statusLabelBox = Box.createHorizontalBox();
+		statusLabelBox.setBorder(new EmptyBorder(0, 0, 6, 0));
 		add(statusLabelBox, BorderLayout.NORTH);
 		
 		leftGlue = Box.createHorizontalGlue();
 		statusLabelBox.add(leftGlue);
-		
-		timeElapsedLabel = new JLabel("Time Elapsed:");
-		statusLabelBox.add(timeElapsedLabel);
-		
-		timeElapsedStrut = Box.createHorizontalStrut(20);
-		timeElapsedStrut.setPreferredSize(new Dimension(36, 0));
-		statusLabelBox.add(timeElapsedStrut);
 		
 		indexingLabel = new JLabel("Indexing");
 		statusLabelBox.add(indexingLabel);
@@ -126,10 +139,18 @@ public class ProgressPanel extends TabbedPanel {
 		abortButton = new JButton("Abort");
 		statusLabelBox.add(abortButton);
 		
+		logButton = new JButton("Log");
+		logButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		statusLabelBox.add(logButton);
+		
 		rightGlue = Box.createHorizontalGlue();
 		statusLabelBox.add(rightGlue);
 		
 		logScrollPane = new JScrollPane();
+		logScrollPane.setVisible(false);
 		add(logScrollPane, BorderLayout.CENTER);
 		
 		logTextPane = new JTextArea();
@@ -147,6 +168,16 @@ public class ProgressPanel extends TabbedPanel {
 				tabCloseButtonAction();
 			}
 			
+		});
+		
+		logButton.addActionListener(new AbstractAction() {
+
+			@Override
+			public void actionPerformed (ActionEvent e) {
+		
+				logScrollPane.setVisible(!logScrollPane.isVisible());
+			}
+
 		});
 		
 	}
@@ -283,19 +314,19 @@ public class ProgressPanel extends TabbedPanel {
 		this.groupingLabel = groupingLabel;
 	}
 
-	/**
-	 * @return the timeElapsedLabel
-	 */
-	public JLabel getTimeElapsedLabel () {
-		return timeElapsedLabel;
-	}
-
-	/**
-	 * @param timeElapsedLabel the timeElapsedLabel to set
-	 */
-	public void setTimeElapsedLabel (JLabel timeElapsedLabel) {
-		this.timeElapsedLabel = timeElapsedLabel;
-	}
+//	/**
+//	 * @return the timeElapsedLabel
+//	 */
+//	public JLabel getTimeElapsedLabel () {
+//		return timeElapsedLabel;
+//	}
+//
+//	/**
+//	 * @param timeElapsedLabel the timeElapsedLabel to set
+//	 */
+//	public void setTimeElapsedLabel (JLabel timeElapsedLabel) {
+//		this.timeElapsedLabel = timeElapsedLabel;
+//	}
 
 	/**
 	 * @return the logTextPane

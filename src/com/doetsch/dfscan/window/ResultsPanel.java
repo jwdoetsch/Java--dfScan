@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2014 Jacob Wesley Doetsch
+ * 
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 package com.doetsch.dfscan.window;
 
 import java.util.ArrayList;
@@ -39,6 +56,7 @@ import com.doetsch.dfscan.core.Report;
 import com.doetsch.dfscan.util.ContentIndex;
 import com.doetsch.dfscan.util.FolderChooser;
 import com.doetsch.dfscan.util.HashableFile;
+import java.awt.Dimension;
 
 
 
@@ -201,15 +219,13 @@ public class ResultsPanel extends TabbedPanel {
 	private JLabel scanResultsLabel;
 	private JComboBox<String> selectorComboBox;
 	private JButton deleteButton;
-	private Box handleControlBox;
 	private Box headerBox;
 	private Box controlBox;
-	private Component controlBoxGlue;
 	private JTabbedPane parentPane;
-	private Component leftGlue;
-	private Component rightGlue;
-	private JButton saveButton;
+	private Box verticalBox;
 	private Component glue;
+	private Box horizontalBox;
+	private Box horizontalBox_1;
 	
 	/**
 	 * Create the frame.
@@ -253,31 +269,40 @@ public class ResultsPanel extends TabbedPanel {
 		headerBox = Box.createVerticalBox();
 		add(headerBox, BorderLayout.NORTH);
 		
+		verticalBox = Box.createVerticalBox();
+		headerBox.add(verticalBox);
+		
+		horizontalBox = Box.createHorizontalBox();
+		verticalBox.add(horizontalBox);
+		
 		scanDetailsLabel = new JLabel("");
-		headerBox.add(scanDetailsLabel);
-				scanDetailsLabel.setText("Scan started by " + resultsReport.getUser()
-				+ " on host " + resultsReport.getHost()
-				+ " at " + resultsReport.getStartTime()
-				+ " on " + resultsReport.getStartDate());
+		horizontalBox.add(scanDetailsLabel);
+		scanDetailsLabel.setText("Scan started by " + resultsReport.getUser()
+		+ " on host " + resultsReport.getHost()
+		+ " at " + resultsReport.getStartTime()
+		+ " on " + resultsReport.getStartDate());
+		
+		horizontalBox_1 = Box.createHorizontalBox();
+		verticalBox.add(horizontalBox_1);
 		
 		scanResultsLabel = new JLabel("");
-		headerBox.add(scanResultsLabel);
+		horizontalBox_1.add(scanResultsLabel);
 		scanResultsLabel.setText("Found " + fileCount + " duplicate files in "
 				+ resultsReport.getGroups().size() + " common groups");
 		
 		controlBox = Box.createHorizontalBox();
+		controlBox.setBorder(new EmptyBorder(6, 0, 6, 0));
 		headerBox.add(controlBox);
 		
 		selectorComboBox = new JComboBox<String>();
+		selectorComboBox.setMaximumSize(new Dimension(240, 32767));
 		controlBox.add(selectorComboBox);
 		selectorComboBox.setModel(new DefaultComboBoxModel(new String[] {"Default Selection", "Select All Entries", "Select None"}));
 		selectorComboBox.setBounds(12, 60, 258, 24);
 		
-		controlBoxGlue = Box.createGlue();
-		controlBox.add(controlBoxGlue);
-		
 
 		sortingComboBox = new JComboBox<String>();
+		sortingComboBox.setMaximumSize(new Dimension(240, 32767));
 		controlBox.add(sortingComboBox);
 		sortingComboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"Sort By...", "Size (Ascending)", "Size (Descending)", "Name (Ascending)", "Name (Descending)"}));
 		sortingComboBox.setBounds(282, 60, 570, 24);
@@ -285,24 +310,12 @@ public class ResultsPanel extends TabbedPanel {
 		glue = Box.createGlue();
 		controlBox.add(glue);
 		
-		saveButton = new JButton("Save Report");
-		controlBox.add(saveButton);
-		
-		handleControlBox = Box.createHorizontalBox();
-		add(handleControlBox, BorderLayout.SOUTH);
-		
-		leftGlue = Box.createHorizontalGlue();
-		handleControlBox.add(leftGlue);
-		
 		deleteButton = new JButton("Delete Selected...");
-		handleControlBox.add(deleteButton);
+		controlBox.add(deleteButton);
 		deleteButton.setBounds(438, 492, 414, 24);
 		
 		moveButton = new JButton("Move Selected Files...");
-		handleControlBox.add(moveButton);
-		
-		rightGlue = Box.createHorizontalGlue();
-		handleControlBox.add(rightGlue);
+		controlBox.add(moveButton);
 		
 		buildTable();
 	}
