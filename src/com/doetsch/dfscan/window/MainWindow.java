@@ -142,7 +142,6 @@ public class MainWindow extends JFrame {
 	private JSeparator fileMenuSeparator;
 	private JMenu helpMenu;
 	private JMenuItem updateMenuItem;
-	private JSeparator helpMenuSeparator;
 	private JMenuItem guideMenuItem;
 	private JButton moveUpButton;
 	private JButton moveDownButton;
@@ -152,7 +151,6 @@ public class MainWindow extends JFrame {
 	private JTextField nameTextField;
 	private JTextArea descriptionTextArea;
 	private JMenuItem wizardMenuItem;
-	private JMenuItem donateMenuItem;
 	private TrayIcon systemTrayIcon;
 
 	/**
@@ -198,13 +196,6 @@ public class MainWindow extends JFrame {
 		
 		guideMenuItem = new JMenuItem("User Guide");
 		helpMenu.add(guideMenuItem);
-		
-		donateMenuItem = new JMenuItem("Donate");
-		donateMenuItem.setToolTipText("A donation would go a long way to supporting us, and we'd love you forever!");
-		helpMenu.add(donateMenuItem);
-		
-		helpMenuSeparator = new JSeparator();
-		helpMenu.add(helpMenuSeparator);
 		
 		updateMenuItem = new JMenuItem("Update");
 		helpMenu.add(updateMenuItem);
@@ -724,7 +715,7 @@ public class MainWindow extends JFrame {
 		profileComboBox.setModel(new DefaultComboBoxModel<ProfileEntry>() );
 		
 		((DefaultComboBoxModel<ProfileEntry>)profileComboBox.getModel()).addElement(
-				new ProfileEntry(new Profile("Select a profile or define your own...", "Does Something Wonderful")));
+				new ProfileEntry(new Profile("Custom Profile", "Description")));
 		
 		for (HashableFile file : profileIndex) {
 
