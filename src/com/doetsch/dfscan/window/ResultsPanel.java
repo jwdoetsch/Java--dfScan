@@ -50,12 +50,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.TrayIcon;
 
 import com.doetsch.dfscan.DFScan;
 import com.doetsch.dfscan.core.Report;
 import com.doetsch.dfscan.util.ContentIndex;
 import com.doetsch.dfscan.util.FolderChooser;
 import com.doetsch.dfscan.util.HashableFile;
+
 import java.awt.Dimension;
 
 
@@ -230,10 +232,10 @@ public class ResultsPanel extends TabbedPanel {
 	/**
 	 * Create the frame.
 	 */
-	public ResultsPanel(Report resultsReport, JTabbedPane parentPane) {
+	public ResultsPanel(Report resultsReport, JTabbedPane parentPane, TrayIcon trayIcon) {
 
 		super(resultsReport.getFinishDate() + " " + resultsReport.getFinishTime() + " " + resultsReport.getProfileName(),
-				new ImageIcon(DFScan.class.getResource("resources/icons/report_icon2.gif")));
+				new ImageIcon(DFScan.class.getResource("resources/icons/report_icon2.gif")), trayIcon);
 		setBorder(new EmptyBorder(6, 6, 6, 6));
 		
 		this.parentPane = parentPane;

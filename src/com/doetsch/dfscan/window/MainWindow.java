@@ -17,11 +17,15 @@
 
 package com.doetsch.dfscan.window;
 
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Event;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.SystemTray;
 import java.awt.Toolkit;
+import java.awt.TrayIcon;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -44,6 +48,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.Component;
 import java.io.File;
@@ -146,6 +151,7 @@ public class MainWindow extends JFrame {
 	private JTextArea descriptionTextArea;
 	private JMenuItem wizardMenuItem;
 	private JMenuItem donateMenuItem;
+	private TrayIcon systemTrayIcon;
 
 	/**
 	 * Create the frame.
@@ -369,10 +375,19 @@ public class MainWindow extends JFrame {
 		splitPane.setDividerLocation(400);
 		
 		showUserGuide();
-//		UserGuidePanel welcomePanel = new UserGuidePanel(reportTabbedPane);
-//		reportTabbedPane.addTab("", null, welcomePanel, "Welcome Page");
-//		reportTabbedPane.setTabComponentAt(
-//				reportTabbedPane.indexOfComponent(welcomePanel), welcomePanel.getTabAsComponent());
+		
+		if (SystemTray.isSupported()) {
+		
+			systemTrayIcon = new TrayIcon((new ImageIcon(DFScan.class.getResource("resources/icons/tray_icon.png"))).getImage());
+			
+			try {
+				SystemTray.getSystemTray().add(systemTrayIcon);
+	
+			} catch (AWTException e) {
+				e.printStackTrace();
+			}
+		}
+		
 	}
 	
 	private void setBehavior () {
@@ -429,7 +444,7 @@ public class MainWindow extends JFrame {
 			@Override
 			public void actionPerformed (ActionEvent arg0) {
 				
-				ProgressPanel progressPanel = new ProgressPanel(buildCurrentDetectionProfile(), reportTabbedPane);
+				ProgressPanel progressPanel = new ProgressPanel(buildCurrentDetectionProfile(), reportTabbedPane, systemTrayIcon);
 			}
 			
 		});
@@ -595,22 +610,6 @@ public class MainWindow extends JFrame {
 			
 		});
 		
-//		ChangeListener selectionChangeListener = new ChangeListener() {
-//
-//			@Override
-//			public void stateChanged (ChangeEvent arg0) {
-//				populateProfileSummary();
-//			}
-//			
-//		};
-//		
-//		scanSubFoldersCheckBox.addChangeListener(selectionChangeListener);
-//		scanHiddenFoldersCheckBox.addChangeListener(selectionChangeListener);
-//		scanReadOnlyFoldersCheckBox.addChangeListener(selectionChangeListener);
-//		indexInclusivelyCheckBox.addChangeListener(selectionChangeListener);
-
-		
-		
 		/*
 		 * Defines the behavior of the menu bar items.
 		 */
@@ -623,6 +622,22 @@ public class MainWindow extends JFrame {
 			
 		});
 		
+		/*
+		 * Defines the behavior upon the main window closing down.
+		 */
+		this.addWindowListener(new WindowAdapter() {
+			
+			/*
+			 * Removes the system tray icon upon normal application closure.
+			 */
+			@Override
+			public void windowClosing (WindowEvent e) {
+				if (systemTrayIcon != null) {
+					SystemTray.getSystemTray().remove(systemTrayIcon);
+				}
+			}
+			
+		});
 		
 	}
 	
@@ -668,7 +683,7 @@ public class MainWindow extends JFrame {
 	}
 
 	private void showUserGuide () {
-		UserGuidePanel userGuidePanel = new UserGuidePanel(reportTabbedPane);
+		UserGuidePanel userGuidePanel = new UserGuidePanel(reportTabbedPane, systemTrayIcon);
 		reportTabbedPane.addTab("", null, userGuidePanel, "Welcome Page");
 		reportTabbedPane.setTabComponentAt(
 				reportTabbedPane.indexOfComponent(userGuidePanel), userGuidePanel.getTabAsComponent());

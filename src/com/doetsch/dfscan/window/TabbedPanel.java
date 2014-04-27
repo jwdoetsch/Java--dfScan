@@ -22,6 +22,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -138,10 +139,12 @@ public abstract class TabbedPanel extends JPanel {
 	
 	private TabLabel tab;
 	private AbstractAction buttonAction;
-	public ImageIcon tabIcon;
+	private ImageIcon tabIcon;
+	private TrayIcon trayIcon;
 	
-	public TabbedPanel (String title, ImageIcon tabIcon) {
+	public TabbedPanel (String title, ImageIcon tabIcon, TrayIcon trayIcon) {
 		this.tab = new TabLabel(title, tabIcon);
+		this.trayIcon = trayIcon;
 
 		init();
 	}
@@ -181,5 +184,9 @@ public abstract class TabbedPanel extends JPanel {
 	}
 	
 	public abstract void closePanel ();
+	
+	public TrayIcon getTrayIcon () {
+		return trayIcon;
+	}
 
 }

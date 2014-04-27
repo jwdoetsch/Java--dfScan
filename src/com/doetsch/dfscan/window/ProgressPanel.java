@@ -20,6 +20,7 @@ package com.doetsch.dfscan.window;
 import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
+import java.awt.TrayIcon;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -43,7 +44,9 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.concurrent.ExecutionException;
+
 import javax.swing.border.EmptyBorder;
+
 import java.awt.event.ActionListener;
 
 /**
@@ -72,15 +75,17 @@ public class ProgressPanel extends TabbedPanel {
 	private JTabbedPane parentPane;
 	private Component leftGlue;
 	private JButton logButton;
+	private TrayIcon trayIcon;
 
 	/**
 	 * Create the panel.
 	 */
-	public ProgressPanel (Profile detectionProfile, JTabbedPane parentPane) {
+	public ProgressPanel (Profile detectionProfile, JTabbedPane parentPane, TrayIcon trayIcon) {
 		super("" + detectionProfile.getName(),
-				new ImageIcon(DFScan.class.getResource("resources/icons/scan_icon.gif")));
+				new ImageIcon(DFScan.class.getResource("resources/icons/scan_icon.gif")), trayIcon);
 		setBorder(new EmptyBorder(6, 6, 6, 6));
 		
+		this.trayIcon = trayIcon;
 		this.detectionProfile = detectionProfile;
 		this.parentPane = parentPane;
 
@@ -219,11 +224,13 @@ public class ProgressPanel extends TabbedPanel {
 						 */
 						if (!detectionTask.isCancelled()) {
 							try {
-								ResultsPanel resultsPanel = new ResultsPanel(detectionTask.get(), parentPane);
-//								parentPane.addTab("", null, resultsPanel, null);
-//								parentPane.setTabComponentAt(
-//										parentPane.indexOfComponent(resultsPanel), resultsPanel.getTabAsComponent());
-//								parentPane.setSelectedComponent(resultsPanel);
+								ResultsPanel resultsPanel = new ResultsPanel(detectionTask.get(), parentPane, trayIcon);
+								if (trayIcon != null) {
+									trayIcon.displayMessage("Scan Finished",
+											"A scan using the profile " + detectionProfile.getName() +
+											" has finished. The results of the scan are ready.",
+											TrayIcon.MessageType.INFO);
+								}
 								
 							} catch (InterruptedException | ExecutionException e1) {
 								//System.out.println("Report not retrievable from the detection task!");
